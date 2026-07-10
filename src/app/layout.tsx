@@ -33,7 +33,7 @@ export default function RootLayout({
       lang="en"
       className={`${playfair.variable} ${bebas.variable} ${inter.variable}`}
     >
-      <body className="bg-black text-white antialiased">{children}</body>
+      <body className="bg-black text-white antialiased font-playfair">{children}</body>
     </html>
   );
 }

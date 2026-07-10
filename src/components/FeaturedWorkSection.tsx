@@ -3,112 +3,218 @@
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 
-function useInView(threshold = 0.1) {
+function useInView(threshold = 0.15) {
   const ref = useRef<HTMLDivElement>(null);
   const [inView, setInView] = useState(false);
+
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
-    const obs = new IntersectionObserver(
-      ([e]) => { if (e.isIntersecting) setInView(true); },
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setInView(true);
+        }
+      },
       { threshold }
     );
-    obs.observe(el);
-    return () => obs.disconnect();
+
+    observer.observe(el);
+
+    return () => observer.disconnect();
   }, [threshold]);
+
   return { ref, inView };
 }
-
-const ArrowIcon = () => (
-  <svg width="11" height="11" viewBox="0 0 12 12" fill="none" className="inline ml-1 align-middle">
-    <path d="M1 6h10M6 1l5 5-5 5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-  </svg>
-);
 
 const works = [
   {
     id: 1,
-    label: "Pinnacle Business Park, 2024",
-    sublabel: "Brand Photoshoot",
-    cta: "Check out the page",
-    photo: "/images/featured_works/e643c18c911698d2b1c6f26951bab888.jpg",
-    delayMs: 150,
+    title: "PINNACLE BUSINESS PARK, 2024",
+    subtitle: "BRAND PHOTOSHOOT",
+    cta: "CHECK OUT THE PAGE",
+    image:
+      "/images/featured_works/e643c18c911698d2b1c6f26951bab888.jpg",
   },
   {
     id: 2,
-    label: "Dec 18, 2024",
-    sublabel: "Runway Show",
-    cta: "Check out the reel",
-    photo: "/images/featured_works/d67b374abf8d99540107eef87e4b9f71.jpg",
-    delayMs: 300,
+    title: "IKFW, 2024",
+    subtitle: "RUNWAY SHOW",
+    cta: "CHECK OUT THE REEL",
+    image:
+      "/images/featured_works/d67b374abf8d99540107eef87e4b9f71.jpg",
   },
 ];
+
+const ArrowIcon = () => (
+  <svg
+    width="24"
+    height="24"
+    viewBox="0 0 24 24"
+    fill="none"
+    className="ml-2"
+  >
+    <path
+      d="M12 4V20"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+    />
+    <path
+      d="M6 14L12 20L18 14"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </svg>
+);
 
 export default function FeaturedWorkSection() {
   const { ref, inView } = useInView();
 
   return (
-    <section ref={ref} className="bg-black py-14 sm:py-16 lg:py-20 px-4 sm:px-8 lg:px-16 overflow-hidden">
-      <div className="max-w-6xl mx-auto">
+    <section
+      ref={ref}
+      className="bg-black overflow-hidden py-20 md:py-28 lg:py-36"
+    >
+      <div className="container mx-auto px-6 md:px-10 lg:px-16">
 
         {/* Heading */}
         <div
-          className="mb-8 sm:mb-10"
-          style={{
-            opacity: inView ? 1 : 0,
-            transform: inView ? "translateX(0)" : "translateX(-40px)",
-            transition: "opacity 0.7s ease 0ms, transform 0.7s ease 0ms",
-          }}
+          className={`transition-all duration-1000 ${inView
+            ? "opacity-100 translate-y-0"
+            : "opacity-0 translate-y-10"
+            }`}
         >
-          <h2 className="font-bebas text-white leading-none
-            text-5xl sm:text-6xl md:text-7xl lg:text-8xl">
+          <h2
+            className="
+              text-white
+              font-light
+              leading-[0.82]
+              tracking-[-0.06em]
+              text-[72px]
+              sm:text-[100px]
+              md:text-[107px]
+              lg:text-[107px]
+              xl:text-[107px]
+            "
+          >
             FEATURED
             <br />
             WORK
           </h2>
         </div>
 
-        {/* Cards — 1 col on mobile, 2 cols on sm+ */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 sm:gap-6 lg:gap-10">
-          {works.map((w) => (
-            <div
-              key={w.id}
-              style={{
-                opacity: inView ? 1 : 0,
-                transform: inView ? "translateY(0)" : "translateY(30px)",
-                transition: `opacity 0.65s ease ${w.delayMs}ms, transform 0.65s ease ${w.delayMs}ms`,
-              }}
-            >
-              {/* Meta */}
-              <div className="mb-3">
-                <p className="font-inter text-white/50 tracking-widest uppercase text-[10px]">
-                  {w.label}
-                </p>
-                <p className="font-inter text-white tracking-widest uppercase font-semibold text-[11px] sm:text-xs mt-0.5">
-                  {w.sublabel}
-                </p>
-                <a
-                  href="#"
-                  className="font-inter text-[#c9a84c] tracking-widest uppercase hover:text-white transition-colors text-[10px]"
-                >
-                  {w.cta}
-                  <ArrowIcon />
-                </a>
+        {/* Works Grid */}
+        <div className="mt-16 lg:mt-24 grid lg:grid-cols-2 gap-16 lg:gap-24 items-start">
+
+          {/* Left Card */}
+          <div
+            className={`lg:mt-28 transition-all duration-1000 delay-200 ${inView
+              ? "opacity-100 translate-y-0"
+              : "opacity-0 translate-y-12"
+              }`}
+          >
+            <div className="mb-6">
+
+              <div className="flex items-start justify-between">
+                <div>
+                  <h3 className="text-white font-bold uppercase text-lg md:text-[16px] leading-tight">
+                    {works[0].title}
+                  </h3>
+
+                  <h4 className="text-white font-bold uppercase text-lg md:text-[16px] leading-tight mt-1">
+                    {works[0].subtitle}
+                  </h4>
+                </div>
+
+                <ArrowIcon />
               </div>
 
-              {/* Photo */}
-              <div className="photo-hover rounded-xl sm:rounded-2xl overflow-hidden aspect-4/3 relative">
-                <Image
-                  src={w.photo}
-                  alt={w.sublabel}
-                  fill
-                  className="object-cover"
-                  sizes="(max-width: 640px) 100vw, 50vw"
-                />
-                <div className="absolute inset-0 bg-linear-to-t from-black/40 to-transparent" />
-              </div>
+              <a
+                href="#"
+                className="
+                  inline-block
+                  mt-5
+                  text-white
+                  uppercase
+                  underline
+                  underline-offset-4
+                  text-sm
+                  tracking-wide
+                  hover:opacity-70
+                  transition
+                  md:text-[14px]
+                "
+              >
+                {works[0].cta}
+              </a>
             </div>
-          ))}
+
+            <div className="relative h-[300px] w-[508px] rounded-[34px] overflow-hidden">
+              <Image
+                src={works[0].image}
+                alt={works[0].subtitle}
+                fill
+                className="object-[15%_15%] object-cover transition-transform duration-700 hover:scale-105"
+              />
+            </div>
+          </div>
+
+          {/* Right Card */}
+          <div
+            className={`transition-all duration-1000 delay-500 ${inView
+              ? "opacity-100 translate-y-0"
+              : "opacity-0 translate-y-12"
+              }`}
+          >
+            <div className="mb-6">
+
+              <div className="flex items-start justify-between">
+                <div>
+                  <h3 className="text-white font-bold uppercase text-lg md:text-xl leading-tight">
+                    {works[1].title}
+                  </h3>
+
+                  <h4 className="text-white font-bold uppercase text-lg md:text-xl leading-tight mt-1">
+                    {works[1].subtitle}
+                  </h4>
+                </div>
+
+                <ArrowIcon />
+              </div>
+
+              <a
+                href="#"
+                className="
+                  inline-block
+                  mt-5
+                  text-white
+                  uppercase
+                  underline
+                  underline-offset-4
+                  text-sm
+                  tracking-wide
+                  hover:opacity-70
+                  transition
+                "
+              >
+                {works[1].cta}
+              </a>
+            </div>
+
+            <div className="relative aspect-[16/10] rounded-[34px] overflow-hidden">
+              <Image
+                src={works[1].image}
+                alt={works[1].subtitle}
+                fill
+                className="object-cover transition-transform duration-700 hover:scale-105"
+              />
+            </div>
+          </div>
+
         </div>
       </div>
     </section>
