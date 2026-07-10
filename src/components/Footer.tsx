@@ -2,7 +2,7 @@ import { FaInstagram } from 'react-icons/fa6';
 
 export default function Footer() {
   return (
-    <footer className='bg-black text-white min-h-screen flex items-center'>
+    <footer className='bg-black text-white  flex items-center'>
       <div className='container mx-auto px-10 lg:px-20'>
    
 

@@ -7,7 +7,7 @@ import Footer from "@/components/Footer";
 import EditorialGallerySection from "@/components/EditorialGallerySection"
 export default function Home() {
   return (
-    <main>
+    <main >
       <HeroSection />
 
       <BioSection />

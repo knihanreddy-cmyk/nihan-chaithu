@@ -108,7 +108,7 @@ export default function FeaturedWorkSection() {
         </div>
 
         {/* Works Grid */}
-        <div className="mt-16 lg:mt-24 grid lg:grid-cols-2 gap-16 lg:gap-24 items-start">
+        <div className=" lg:mt-24 grid lg:grid-cols-2 gap-16 lg:gap-24 items-end">
 
           {/* Left Card */}
           <div
@@ -119,9 +119,9 @@ export default function FeaturedWorkSection() {
           >
             <div className="mb-6">
 
-              <div className="flex items-start justify-between">
-                <div>
-                  <h3 className="text-white font-bold uppercase text-lg md:text-[16px] leading-tight">
+              <div className="flex items-start  justify-between">
+                <div className="">
+                  <h3 className="text-white font-bold  uppercase text-lg md:text-[16px] leading-tight">
                     {works[0].title}
                   </h3>
 
