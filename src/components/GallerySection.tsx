@@ -42,34 +42,34 @@ export default function GallerySection() {
   const { ref, inView } = useInView();
 
   return (
-    <section className="bg-black py-20 lg:py-32 px-6 lg:px-16 overflow-hidden">
+    <section className="bg-black py-16 sm:py-20 lg:py-32 px-4 sm:px-6 lg:px-16 overflow-hidden">
       <div ref={ref} className="container mx-auto">
 
         {/* ── Heading ── */}
         <div
-          className={`mb-12 transition-all duration-700
+          className={`mb-8 sm:mb-12 transition-all duration-700
             ${inView ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"}`}
         >
           <p className="font-inter text-[#c9a84c] text-[10px] uppercase tracking-[0.38em] mb-3">
             Gallery
           </p>
           <h2 className="font-bebas text-white leading-[0.88] tracking-[-0.02em]
-            text-[clamp(4rem,10vw,9rem)]">
+            text-[clamp(3rem,10vw,9rem)]">
             Work With Me
           </h2>
-          <div className="w-full h-px bg-white/10 mt-8" />
+          <div className="w-full h-px bg-white/10 mt-6 sm:mt-8" />
         </div>
 
         {/* ── Masonry (CSS columns) ── */}
-        <div className="columns-2 md:columns-3 lg:columns-4 gap-3 lg:gap-4">
+        <div className="columns-2 md:columns-3 lg:columns-4 gap-2 sm:gap-3 lg:gap-4">
           {photos.map((photo, i) => (
             <div
               key={photo.src}
-              className={`break-inside-avoid mb-3 lg:mb-4
+              className={`break-inside-avoid mb-2 sm:mb-3 lg:mb-4
                 transition-all duration-700 ${DELAYS[i]}
                 ${inView ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}
             >
-              <div className="overflow-hidden rounded-2xl group">
+              <div className="overflow-hidden rounded-xl sm:rounded-2xl group">
                 <Image
                   src={photo.src}
                   alt={photo.alt}
@@ -77,7 +77,7 @@ export default function GallerySection() {
                   height={photo.h}
                   className="w-full h-auto object-cover object-top
                     transition-transform duration-500 group-hover:scale-[1.05] block"
-                  sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                  sizes="(max-width: 640px) 50vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
                 />
               </div>
             </div>

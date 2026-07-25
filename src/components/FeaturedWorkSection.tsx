@@ -68,12 +68,12 @@ function WorkRow({
   return (
     <div
       ref={ref}
-      className={`flex flex-col ${reverse ? "md:flex-row-reverse" : "md:flex-row"} items-stretch gap-8 lg:gap-14`}
+      className={`flex flex-col ${reverse ? "md:flex-row-reverse" : "md:flex-row"} items-stretch gap-6 sm:gap-8 lg:gap-14`}
     >
       {/* Photo */}
       <div
-        className={`md:w-[58%] relative overflow-hidden rounded-[24px]
-          aspect-4/3 md:aspect-auto md:min-h-[440px] lg:min-h-[520px]
+        className={`md:w-[58%] relative overflow-hidden rounded-2xl sm:rounded-3xl
+          aspect-3/4 sm:aspect-4/3 md:aspect-auto md:min-h-110 lg:min-h-130
           group transition-all duration-700 ease-out
           ${inView
             ? "opacity-100 translate-x-0"
@@ -98,22 +98,22 @@ function WorkRow({
           transition-all duration-700 ease-out delay-150
           ${inView ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}
       >
-        <span className="font-bebas text-[#c9a84c] leading-none mb-4 select-none
-          text-[clamp(3rem,6vw,5.5rem)]">
+        <span className="font-bebas text-[#c9a84c] leading-none mb-3 sm:mb-4 select-none
+          text-[clamp(2.5rem,6vw,5.5rem)]">
           {work.num}
         </span>
         <p className="font-inter text-white/35 uppercase tracking-[0.32em] text-[9px] mb-1">
           {work.date}
         </p>
-        <p className="font-inter text-white/50 uppercase tracking-[0.2em] text-[10px] mb-5">
+        <p className="font-inter text-white/50 uppercase tracking-[0.2em] text-[10px] mb-4">
           {work.label}
         </p>
-        <h3 className="font-bebas text-white leading-none tracking-wide mb-5
-          text-[clamp(2.2rem,4.5vw,3.8rem)]">
+        <h3 className="font-bebas text-white leading-none tracking-wide mb-4 sm:mb-5
+          text-[clamp(2rem,4.5vw,3.8rem)]">
           {work.title}
         </h3>
-        <div className="w-10 h-px bg-[#c9a84c] mb-5" />
-        <p className="font-inter text-white/50 text-[13px] leading-[1.75] mb-8 max-w-xs">
+        <div className="w-10 h-px bg-[#c9a84c] mb-4 sm:mb-5" />
+        <p className="font-inter text-white/50 text-[13px] leading-[1.75] mb-7 sm:mb-8 max-w-full sm:max-w-xs">
           {work.description}
         </p>
         <a
@@ -138,13 +138,13 @@ export default function FeaturedWorkSection() {
   const { ref, inView } = useInView();
 
   return (
-    <section className="bg-black py-20 lg:py-32 px-6 lg:px-16 overflow-hidden">
+    <section className="bg-black py-16 sm:py-24 lg:py-32 px-5 sm:px-8 lg:px-16 overflow-hidden">
       <div className="max-w-6xl mx-auto">
 
         {/* Header */}
         <div
           ref={ref}
-          className={`mb-16 lg:mb-24 transition-all duration-700 ease-out
+          className={`mb-10 sm:mb-14 lg:mb-24 transition-all duration-700 ease-out
             ${inView ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}
         >
           <p className="font-inter text-[#c9a84c] text-[10px] tracking-[0.38em] uppercase mb-3">
@@ -158,7 +158,7 @@ export default function FeaturedWorkSection() {
         </div>
 
         {/* Rows */}
-        <div className="flex flex-col gap-20 lg:gap-32">
+        <div className="flex flex-col gap-12 sm:gap-20 lg:gap-32">
           {works.map((work, i) => (
             <WorkRow key={work.num} work={work} reverse={i % 2 === 1} />
           ))}
