@@ -31,6 +31,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
+      data-scroll-behavior="smooth"
       className={`${playfair.variable} ${bebas.variable} ${inter.variable}`}
     >
       <body className="bg-black text-white antialiased font-playfair">{children}</body>

@@ -3,219 +3,167 @@
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 
-function useInView(threshold = 0.15) {
+function useInView(threshold = 0.12) {
   const ref = useRef<HTMLDivElement>(null);
   const [inView, setInView] = useState(false);
-
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setInView(true);
-        }
-      },
+    const obs = new IntersectionObserver(
+      ([e]) => { if (e.isIntersecting) setInView(true); },
       { threshold }
     );
-
-    observer.observe(el);
-
-    return () => observer.disconnect();
+    obs.observe(el);
+    return () => obs.disconnect();
   }, [threshold]);
-
   return { ref, inView };
 }
 
-const works = [
-  {
-    id: 1,
-    title: "PINNACLE BUSINESS PARK, 2024",
-    subtitle: "BRAND PHOTOSHOOT",
-    cta: "CHECK OUT THE PAGE",
-    image:
-      "/images/featured_works/e643c18c911698d2b1c6f26951bab888.jpg",
-  },
-  {
-    id: 2,
-    title: "IKFW, 2024",
-    subtitle: "RUNWAY SHOW",
-    cta: "CHECK OUT THE REEL",
-    image:
-      "/images/featured_works/d67b374abf8d99540107eef87e4b9f71.jpg",
-  },
-];
-
-const ArrowIcon = () => (
-  <svg
-    width="24"
-    height="24"
-    viewBox="0 0 24 24"
-    fill="none"
-    className="ml-2"
-  >
+const ArrowRight = () => (
+  <svg width="13" height="13" viewBox="0 0 12 12" fill="none">
     <path
-      d="M12 4V20"
+      d="M1 6h10M6 1l5 5-5 5"
       stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-    />
-    <path
-      d="M6 14L12 20L18 14"
-      stroke="currentColor"
-      strokeWidth="2"
+      strokeWidth="1.8"
       strokeLinecap="round"
       strokeLinejoin="round"
     />
   </svg>
 );
 
+const works = [
+  {
+    num: "01",
+    date: "2024",
+    label: "Pinnacle Business Park",
+    title: "Brand Photoshoot",
+    description:
+      "A brand campaign shot at one of Bangalore's premier business destinations — capturing confidence, couture, and camera presence.",
+    cta: "View Campaign",
+    photo: "/images/featured_works/e643c18c911698d2b1c6f26951bab888.jpg",
+    pos: "15% 15%",
+  },
+  {
+    num: "02",
+    date: "Dec 18 · 2024",
+    label: "India Kids Fashion Week",
+    title: "Runway Show",
+    description:
+      "Taking the stage at IKFW Season 11 — a showcase of poise and grace that brought the crowd to its feet.",
+    cta: "Watch the Reel",
+    photo: "/images/featured_works/d67b374abf8d99540107eef87e4b9f71.jpg",
+    pos: "center center",
+  },
+];
+
+function WorkRow({
+  work,
+  reverse,
+}: {
+  work: (typeof works)[0];
+  reverse: boolean;
+}) {
+  const { ref, inView } = useInView();
+
+  return (
+    <div
+      ref={ref}
+      className={`flex flex-col ${reverse ? "md:flex-row-reverse" : "md:flex-row"} items-stretch gap-8 lg:gap-14`}
+    >
+      {/* Photo */}
+      <div
+        className={`md:w-[58%] relative overflow-hidden rounded-[24px]
+          aspect-4/3 md:aspect-auto md:min-h-[440px] lg:min-h-[520px]
+          group transition-all duration-700 ease-out
+          ${inView
+            ? "opacity-100 translate-x-0"
+            : `opacity-0 ${reverse ? "translate-x-10" : "-translate-x-10"}`
+          }`}
+      >
+        <Image
+          src={work.photo}
+          alt={work.title}
+          fill
+          className="object-cover transition-transform duration-700 group-hover:scale-[1.04]"
+          style={{ objectPosition: work.pos }}
+          sizes="(max-width: 768px) 100vw, 58vw"
+        />
+        <div className="absolute inset-0 bg-linear-to-t from-black/20 to-transparent" />
+      </div>
+
+      {/* Content */}
+      <div
+        className={`md:w-[42%] flex flex-col justify-center
+          ${reverse ? "md:pr-4 lg:pr-8" : "md:pl-4 lg:pl-8"}
+          transition-all duration-700 ease-out delay-150
+          ${inView ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}
+      >
+        <span className="font-bebas text-[#c9a84c] leading-none mb-4 select-none
+          text-[clamp(3rem,6vw,5.5rem)]">
+          {work.num}
+        </span>
+        <p className="font-inter text-white/35 uppercase tracking-[0.32em] text-[9px] mb-1">
+          {work.date}
+        </p>
+        <p className="font-inter text-white/50 uppercase tracking-[0.2em] text-[10px] mb-5">
+          {work.label}
+        </p>
+        <h3 className="font-bebas text-white leading-none tracking-wide mb-5
+          text-[clamp(2.2rem,4.5vw,3.8rem)]">
+          {work.title}
+        </h3>
+        <div className="w-10 h-px bg-[#c9a84c] mb-5" />
+        <p className="font-inter text-white/50 text-[13px] leading-[1.75] mb-8 max-w-xs">
+          {work.description}
+        </p>
+        <a
+          href="#"
+          className="group/btn inline-flex items-center gap-2.5 w-fit
+            font-inter text-[10px] uppercase tracking-[0.26em]
+            text-white border border-white/20
+            hover:border-[#c9a84c] hover:text-[#c9a84c]
+            px-6 py-3 rounded-full transition-all duration-300"
+        >
+          {work.cta}
+          <span className="transition-transform duration-300 group-hover/btn:translate-x-1">
+            <ArrowRight />
+          </span>
+        </a>
+      </div>
+    </div>
+  );
+}
+
 export default function FeaturedWorkSection() {
   const { ref, inView } = useInView();
 
   return (
-    <section
-      ref={ref}
-      className="bg-black overflow-hidden py-20 md:py-28 lg:py-36"
-    >
-      <div className="container mx-auto px-6 md:px-10 lg:px-16">
+    <section className="bg-black py-20 lg:py-32 px-6 lg:px-16 overflow-hidden">
+      <div className="max-w-6xl mx-auto">
 
-        {/* Heading */}
+        {/* Header */}
         <div
-          className={`transition-all duration-1000 ${inView
-            ? "opacity-100 translate-y-0"
-            : "opacity-0 translate-y-10"
-            }`}
+          ref={ref}
+          className={`mb-16 lg:mb-24 transition-all duration-700 ease-out
+            ${inView ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}
         >
-          <h2
-            className="
-              text-white
-              font-light
-              leading-[0.82]
-              tracking-[-0.06em]
-              text-[72px]
-              sm:text-[100px]
-              md:text-[107px]
-              lg:text-[107px]
-              xl:text-[107px]
-            "
-          >
-            FEATURED
-            <br />
-            WORK
+          <p className="font-inter text-[#c9a84c] text-[10px] tracking-[0.38em] uppercase mb-3">
+            Portfolio
+          </p>
+          <h2 className="font-bebas text-white leading-[0.88] tracking-[-0.01em]
+            text-[clamp(4rem,10vw,9rem)]">
+            FEATURED<br />WORK
           </h2>
+          <div className="w-full h-px bg-white/10 mt-8" />
         </div>
 
-        {/* Works Grid */}
-        <div className=" lg:mt-24 grid lg:grid-cols-2 gap-16 lg:gap-24 items-end">
-
-          {/* Left Card */}
-          <div
-            className={`lg:mt-28 transition-all duration-1000 delay-200 ${inView
-              ? "opacity-100 translate-y-0"
-              : "opacity-0 translate-y-12"
-              }`}
-          >
-            <div className="mb-6">
-
-              <div className="flex items-start  justify-between">
-                <div className="">
-                  <h3 className="text-white font-bold  uppercase text-lg md:text-[16px] leading-tight">
-                    {works[0].title}
-                  </h3>
-
-                  <h4 className="text-white font-bold uppercase text-lg md:text-[16px] leading-tight mt-1">
-                    {works[0].subtitle}
-                  </h4>
-                </div>
-
-                <ArrowIcon />
-              </div>
-
-              <a
-                href="#"
-                className="
-                  inline-block
-                  mt-5
-                  text-white
-                  uppercase
-                  underline
-                  underline-offset-4
-                  text-sm
-                  tracking-wide
-                  hover:opacity-70
-                  transition
-                  md:text-[14px]
-                "
-              >
-                {works[0].cta}
-              </a>
-            </div>
-
-            <div className="relative h-[300px] w-[508px] rounded-[34px] overflow-hidden">
-              <Image
-                src={works[0].image}
-                alt={works[0].subtitle}
-                fill
-                className="object-[15%_15%] object-cover transition-transform duration-700 hover:scale-105"
-              />
-            </div>
-          </div>
-
-          {/* Right Card */}
-          <div
-            className={`transition-all duration-1000 delay-500 ${inView
-              ? "opacity-100 translate-y-0"
-              : "opacity-0 translate-y-12"
-              }`}
-          >
-            <div className="mb-6">
-
-              <div className="flex items-start justify-between">
-                <div>
-                  <h3 className="text-white font-bold uppercase text-lg md:text-xl leading-tight">
-                    {works[1].title}
-                  </h3>
-
-                  <h4 className="text-white font-bold uppercase text-lg md:text-xl leading-tight mt-1">
-                    {works[1].subtitle}
-                  </h4>
-                </div>
-
-                <ArrowIcon />
-              </div>
-
-              <a
-                href="#"
-                className="
-                  inline-block
-                  mt-5
-                  text-white
-                  uppercase
-                  underline
-                  underline-offset-4
-                  text-sm
-                  tracking-wide
-                  hover:opacity-70
-                  transition
-                "
-              >
-                {works[1].cta}
-              </a>
-            </div>
-
-            <div className="relative aspect-[16/10] rounded-[34px] overflow-hidden">
-              <Image
-                src={works[1].image}
-                alt={works[1].subtitle}
-                fill
-                className="object-cover transition-transform duration-700 hover:scale-105"
-              />
-            </div>
-          </div>
-
+        {/* Rows */}
+        <div className="flex flex-col gap-20 lg:gap-32">
+          {works.map((work, i) => (
+            <WorkRow key={work.num} work={work} reverse={i % 2 === 1} />
+          ))}
         </div>
+
       </div>
     </section>
   );
