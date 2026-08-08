@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import { Playfair_Display, Bebas_Neue, Inter } from "next/font/google";
+import { ViewTransition } from "react";
+import { Bebas_Neue, Inter, Playfair_Display } from "next/font/google";
 import "./globals.css";
 
 const playfair = Playfair_Display({
@@ -20,9 +21,9 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Charming Chaithrika — Model & Actress",
+  title: "Charming Chaithrika - Model & Actress",
   description:
-    "Fashion-forward and performance-driven — From India Kids Fashion Week Season 11 to Amazon Kids Dress.",
+    "Fashion-forward and performance-driven - from India Kids Fashion Week Season 11 to Amazon Kids Dress.",
 };
 
 export default function RootLayout({
@@ -34,7 +35,9 @@ export default function RootLayout({
       data-scroll-behavior="smooth"
       className={`${playfair.variable} ${bebas.variable} ${inter.variable}`}
     >
-      <body className="bg-black text-white antialiased font-playfair">{children}</body>
+      <body className="min-h-svh bg-[#050505] text-white antialiased font-playfair">
+        <ViewTransition>{children}</ViewTransition>
+      </body>
     </html>
   );
 }

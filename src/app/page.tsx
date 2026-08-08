@@ -1,5 +1,5 @@
-import SplitHero from "@/components/SplitHero";
+import PortfolioHero from "@/components/portfolio/PortfolioHero";
 
 export default function Home() {
-  return <SplitHero />;
+  return <PortfolioHero />;
 }

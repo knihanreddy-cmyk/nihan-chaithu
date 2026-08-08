@@ -2,7 +2,11 @@
 
 :root {
   --gold: #c9a84c;
-  --gold-light: #e8c96d;
+  --gold-soft: #e9d58b;
+  --ink: #050505;
+  --paper: #f5efe4;
+  --rose: #ba6257;
+  --sage: #9fb7a6;
 }
 
 @theme inline {
@@ -18,40 +22,61 @@
 }
 
 html {
+  background: var(--ink);
   scroll-behavior: smooth;
 }
 
 body {
-  background: #000;
-  color: #fff;
+  min-height: 100svh;
   overflow-x: hidden;
+  background: var(--ink);
+  color: #fff;
+  text-rendering: geometricPrecision;
 }
 
-/* Custom scrollbar */
+a,
+button {
+  -webkit-tap-highlight-color: transparent;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+}
+
+::selection {
+  background: rgba(201, 168, 76, 0.35);
+  color: #fff;
+}
+
 ::-webkit-scrollbar {
-  width: 4px;
-}
-::-webkit-scrollbar-track {
-  background: #000;
-}
-::-webkit-scrollbar-thumb {
-  background: var(--gold);
-  border-radius: 2px;
+  width: 6px;
 }
 
-/* ── Hero animations ── */
-@keyframes pageEnter {
-  from { opacity: 0; transform: translateY(16px); }
-  to   { opacity: 1; transform: translateY(0); }
+::-webkit-scrollbar-track {
+  background: #050505;
 }
-.animate-page-enter {
-  animation: pageEnter 0.55s cubic-bezier(0.22,1,0.36,1) both;
+
+::-webkit-scrollbar-thumb {
+  background: rgba(201, 168, 76, 0.8);
+  border-radius: 999px;
+}
+
+@keyframes pageEnter {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @keyframes fadeInUp {
   from {
     opacity: 0;
-    transform: translateY(40px);
+    transform: translateY(32px);
   }
   to {
     opacity: 1;
@@ -59,149 +84,153 @@ body {
   }
 }
 
-@keyframes fadeInLeft {
-  from {
-    opacity: 0;
-    transform: translateX(-60px);
+@keyframes kenBurns {
+  0% {
+    transform: scale(1) translateX(0);
   }
-  to {
-    opacity: 1;
-    transform: translateX(0);
+  100% {
+    transform: scale(1.06) translateX(-1%);
   }
 }
 
-@keyframes fadeInRight {
-  from {
-    opacity: 0;
-    transform: translateX(60px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-@keyframes sparkle {
-  0%, 100% {
-    opacity: 1;
-    transform: scale(1) rotate(0deg);
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0);
   }
   50% {
-    opacity: 0.5;
-    transform: scale(1.3) rotate(180deg);
+    transform: translateY(-8px);
   }
 }
 
 @keyframes shimmer {
-  0% { background-position: -200% center; }
-  100% { background-position: 200% center; }
-}
-
-@keyframes kenBurns {
-  0% { transform: scale(1) translateX(0); }
-  100% { transform: scale(1.06) translateX(-1%); }
-}
-
-@keyframes float {
-  0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-8px); }
-}
-
-@keyframes revealText {
-  from {
-    clip-path: inset(0 100% 0 0);
+  0% {
+    background-position: -200% center;
   }
-  to {
-    clip-path: inset(0 0% 0 0);
+  100% {
+    background-position: 200% center;
   }
 }
 
-@keyframes scaleIn {
-  from {
-    opacity: 0;
+@keyframes sparkleTwinkle {
+  0%,
+  100% {
+    opacity: 0.35;
     transform: scale(0.85);
   }
-  to {
+  50% {
     opacity: 1;
-    transform: scale(1);
+    transform: scale(1.08);
   }
 }
 
-@keyframes slideUp {
-  from {
-    opacity: 0;
-    transform: translateY(60px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
+.font-playfair {
+  font-family: var(--font-playfair), serif;
+}
+
+.font-bebas {
+  font-family: var(--font-bebas), sans-serif;
+}
+
+.font-inter {
+  font-family: var(--font-inter), sans-serif;
+}
+
+.section-shell {
+  width: min(100% - 2rem, 78rem);
+  margin-inline: auto;
+}
+
+@media (min-width: 640px) {
+  .section-shell {
+    width: min(100% - 4rem, 78rem);
   }
 }
 
-/* ── Utility classes ── */
-.font-playfair { font-family: var(--font-playfair), serif; }
-.font-bebas    { font-family: var(--font-bebas), sans-serif; }
-.font-inter    { font-family: var(--font-inter), sans-serif; }
+.animate-page-enter {
+  animation: pageEnter 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
 
 .animate-fade-up {
-  animation: fadeInUp 0.8s ease forwards;
+  animation: fadeInUp 0.75s ease forwards;
 }
-.animate-fade-left {
-  animation: fadeInLeft 0.9s ease forwards;
+
+.animate-ken-burns {
+  animation: kenBurns 14s ease-in-out alternate infinite;
 }
-.animate-fade-right {
-  animation: fadeInRight 0.9s ease forwards;
-}
-.animate-sparkle {
-  animation: sparkle 2.5s ease-in-out infinite;
-}
+
 .animate-float {
   animation: float 3s ease-in-out infinite;
 }
-.animate-scale-in {
-  animation: scaleIn 0.7s ease forwards;
-}
-.animate-slide-up {
-  animation: slideUp 0.8s ease forwards;
-}
-.animate-ken-burns {
-  animation: kenBurns 12s ease-in-out alternate infinite;
+
+.animate-sparkle {
+  animation: sparkleTwinkle 2.4s ease-in-out infinite;
 }
 
 .gold-text {
-  background: linear-gradient(135deg, #c9a84c 0%, #e8c96d 40%, #c9a84c 60%, #a07830 100%);
+  background: linear-gradient(135deg, #c9a84c 0%, #f2dd95 45%, #a8782c 100%);
   background-size: 200% auto;
   -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
   background-clip: text;
+  -webkit-text-fill-color: transparent;
   animation: shimmer 4s linear infinite;
 }
 
-.glass-card {
+.image-frame {
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
   background: rgba(255, 255, 255, 0.04);
-  backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-.photo-hover {
-  transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94),
-              box-shadow 0.4s ease;
-}
-.photo-hover:hover {
-  transform: scale(1.03) translateY(-4px);
-  box-shadow: 0 20px 60px rgba(201, 168, 76, 0.25);
+.opacity-0-init {
+  opacity: 0;
 }
 
-/* Delay utilities */
-.delay-100  { animation-delay: 0.1s; }
-.delay-200  { animation-delay: 0.2s; }
-.delay-300  { animation-delay: 0.3s; }
-.delay-400  { animation-delay: 0.4s; }
-.delay-500  { animation-delay: 0.5s; }
-.delay-600  { animation-delay: 0.6s; }
-.delay-700  { animation-delay: 0.7s; }
-.delay-800  { animation-delay: 0.8s; }
-.delay-1000 { animation-delay: 1.0s; }
-.delay-1200 { animation-delay: 1.2s; }
+/* Animation-delay utilities for .animate-* keyframe classes (sparkles, shimmer, etc).
+   Deliberately namespaced away from Tailwind's own `delay-*` (transition-delay)
+   utilities — sharing the class name silently killed every staggered
+   transition-delay reveal on the site (hero title/figure, gallery masonry). */
+.anim-delay-100 {
+  animation-delay: 0.1s;
+}
 
-.opacity-0-init { opacity: 0; }
+.anim-delay-200 {
+  animation-delay: 0.2s;
+}
+
+.anim-delay-300 {
+  animation-delay: 0.3s;
+}
+
+.anim-delay-400 {
+  animation-delay: 0.4s;
+}
+
+.anim-delay-500 {
+  animation-delay: 0.5s;
+}
+
+.anim-delay-600 {
+  animation-delay: 0.6s;
+}
+
+/* Custom portfolio cursor replaces the native pointer, but only where a real
+   mouse is in play — coarse (touch) pointers never match this query, so
+   mobile is unaffected without any JS feature-detection. */
+@media (hover: hover) and (pointer: fine) {
+  .portfolio-card {
+    cursor: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}

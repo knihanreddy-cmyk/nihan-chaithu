@@ -1,68 +1,66 @@
 "use client";
 
-import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
+import Image from "next/image";
 
-function useInView(threshold = 0.15) {
-  const ref = useRef<HTMLDivElement>(null);
+function useInView<T extends HTMLElement = HTMLDivElement>(threshold = 0.15) {
+  const ref = useRef<T | null>(null);
   const [inView, setInView] = useState(false);
+
   useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    const obs = new IntersectionObserver(
-      ([e]) => { if (e.isIntersecting) setInView(true); },
-      { threshold }
+    const element = ref.current;
+    if (!element) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) setInView(true);
+      },
+      { threshold },
     );
-    obs.observe(el);
-    return () => obs.disconnect();
+
+    observer.observe(element);
+    return () => observer.disconnect();
   }, [threshold]);
+
   return { ref, inView };
 }
 
 export default function QuoteSection() {
-  const { ref, inView } = useInView();
+  const { ref, inView } = useInView<HTMLElement>();
 
   return (
-    <section ref={ref} className="bg-black py-14 sm:py-16 lg:py-20 px-4 sm:px-8 lg:px-16 overflow-hidden">
-      <div className="container mx-auto flex flex-col sm:flex-row items-center gap-10 sm:gap-12 lg:gap-16">
-
-        {/* Left — quote text */}
+    <section
+      ref={ref}
+      className="bg-[#080808] px-5 py-16 sm:px-8 sm:py-20 lg:px-16 lg:py-24"
+    >
+      <div className="section-shell grid gap-8 lg:grid-cols-[1.1fr_0.9fr] lg:items-center lg:gap-14">
         <div
-          className="sm:w-1/2"
-          style={{
-            opacity:    inView ? 1 : 0,
-            transform:  inView ? "translateX(0)" : "translateX(-36px)",
-            transition: "opacity 0.9s ease, transform 0.9s ease",
-          }}
+          className={`transition-all duration-700 ${
+            inView ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0"
+          }`}
         >
-          <blockquote
-            className="font-inter font-medium text-white uppercase leading-tight tracking-wide
-              text-xl sm:text-2xl md:text-3xl lg:text-[40px]"
-          >
-            Modeling and Acting are similar in some ways and completely different
-            in others. I enjoy the challenge that each type of work brings.
+          <p className="mb-4 font-inter text-[10px] uppercase tracking-[0.28em] text-[#c9a84c]">
+            Perspective
+          </p>
+          <blockquote className="font-playfair text-[clamp(2.2rem,6vw,5.75rem)] font-semibold italic leading-[1.02] text-white">
+            Modeling and acting both ask for presence. I love the challenge each
+            one brings.
           </blockquote>
         </div>
 
-        {/* Right — photo */}
         <div
-          className="sm:w-1/2 w-full relative rounded-2xl sm:rounded-3xl overflow-hidden
-            aspect-5/4 max-w-sm sm:max-w-none"
-          style={{
-            opacity:    inView ? 1 : 0,
-            transform:  inView ? "translateX(0)" : "translateX(36px)",
-            transition: "opacity 0.9s ease 0.15s, transform 0.9s ease 0.15s",
-          }}
+          className={`image-frame relative aspect-[4/5] transition-all delay-150 duration-700 sm:aspect-[5/4] lg:aspect-[4/5] ${
+            inView ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0"
+          }`}
         >
           <Image
             src="/images/modeling/826b469d6b8587ca9ca8d9c3a7a3916e.jpg"
-            alt="Chaithrika in white dress on chair"
+            alt="Chaithrika in a white dress on a chair"
             fill
-            className="object-cover object-top"
-            sizes="(max-width: 640px) 100vw, 50vw"
+            className="object-cover object-[50%_15%]"
+            sizes="(max-width: 1024px) 100vw, 42vw"
           />
         </div>
-
       </div>
     </section>
   );

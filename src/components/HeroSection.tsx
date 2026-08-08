@@ -25,21 +25,23 @@ export default function HeroSection() {
         src="/images/hero/bg.png"
         alt="Runway background"
         fill
-        priority
+        preload
         className={`object-cover object-center z-0 transition-opacity duration-1000 ${
           loaded ? "opacity-100 animate-ken-burns" : "opacity-0"
         }`}
         sizes="100vw"
       />
 
-      <div className="absolute inset-0 z-1" />
+      {/* Scrim: keeps the wordmark legible up top and the caption/scroll-hint
+          legible at the bottom, regardless of what's behind them in bg.png */}
+      <div className="absolute inset-0 z-1 bg-[linear-gradient(180deg,rgba(0,0,0,0.35)_0%,rgba(0,0,0,0.04)_28%,rgba(0,0,0,0.1)_55%,rgba(0,0,0,0.6)_82%,rgba(0,0,0,0.88)_100%)]" />
 
       {/* ── "Charming" + sparkles ──
           Mobile: left-4 top-20 (16px / 80px)
           Tablet: left-20 top-28
           Laptop+: left-68 top-36 — UNCHANGED  */}
       <div
-        className={`absolute z-20 flex items-start gap-2 transition-all duration-700
+        className={`absolute z-20 flex items-start gap-2 transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)]
           left-4 top-20
           sm:left-20 sm:top-28
           lg:left-68 lg:top-36
@@ -55,19 +57,19 @@ export default function HeroSection() {
           className="relative shrink-0"
           style={{ width: "clamp(20px,3vw,46px)", height: "clamp(20px,3vw,46px)", marginTop: "-3px" }}
         >
-          <Sparkle size={40}  className="absolute top-0    left-16    text-[#906955] delay-200" />
-          <Sparkle size={40}  className="absolute bottom-22 left-18   text-[#906955] delay-200" />
-          <Sparkle size={40}  className="absolute bottom-22 left-40   text-[#906955] delay-200" />
+          <Sparkle size={40}  className="absolute top-0    left-16    text-[#906955] animate-sparkle anim-delay-200" />
+          <Sparkle size={40}  className="absolute bottom-22 left-18   text-[#906955] animate-sparkle anim-delay-500" />
+          <Sparkle size={40}  className="absolute bottom-22 left-40   text-[#906955] animate-sparkle anim-delay-300" />
           <Sparkle size={136} className="absolute bottom-0  left-14.25 text-[#906955]" />
-          <Sparkle size={11}  className="absolute bottom-0  left-4     text-[#906955] animate-sparkle delay-400" />
+          <Sparkle size={11}  className="absolute bottom-0  left-4     text-[#906955] animate-sparkle anim-delay-400" />
         </div>
       </div>
 
       {/* ── CHAITHRIKA ── */}
       <div
         className={`absolute inset-x-0 z-10 flex items-center justify-center
-          transition-all duration-1000 delay-300
-          ${loaded ? "opacity-100 scale-100" : "opacity-0 scale-95"}`}
+          transition-all duration-1000 delay-300 ease-[cubic-bezier(0.16,1,0.3,1)]
+          ${loaded ? "opacity-100 scale-100 blur-none" : "opacity-0 scale-95 blur-sm"}`}
         style={{ top: "16%", bottom: "26%" }}
       >
         <h1
@@ -78,7 +80,7 @@ export default function HeroSection() {
             textShadow:    "0 4px 60px rgba(0,0,0,0.45), 0 1px 0 rgba(0,0,0,0.2)",
           }}
         >
-          CHAIT HRIKA
+          CHAITHRIKA
         </h1>
       </div>
 
@@ -89,15 +91,17 @@ export default function HeroSection() {
         className={`absolute bottom-0 left-1/2 -translate-x-1/2 z-20
           w-[80vw] sm:w-[55vw] md:w-[44vw] lg:w-[50vw] xl:w-[18vw]
           max-w-100
-          transition-all duration-1200 delay-500
+          transition-all duration-1200 delay-500 ease-[cubic-bezier(0.16,1,0.3,1)]
           ${loaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-12"}`}
         style={{ height: "clamp(280px, 80svh, 1000px)" }}
       >
+        {/* Soft ground glow gives the cutout figure a sense of depth against the flat scrim */}
+        <div className="absolute inset-x-[10%] bottom-0 h-1/3 -z-10 rounded-full bg-[radial-gradient(closest-side,rgba(0,0,0,0.55),transparent)]" />
         <Image
           src="/images/hero/chaithrika.png"
           alt="Chaithrika"
           fill
-          priority
+          loading="eager"
           className="object-contain object-bottom scale-100 sm:scale-115 lg:scale-138"
           style={{ filter: "drop-shadow(0 10px 40px rgba(0,0,0,0.70))" }}
           sizes="(max-width: 480px) 80vw, (max-width: 768px) 55vw, (max-width: 1024px) 44vw, 21vw"
@@ -110,7 +114,7 @@ export default function HeroSection() {
           Laptop+: original clamp positioning — UNCHANGED */}
       <div
         className={`absolute z-20 flex items-center justify-between gap-4
-          transition-all duration-700 delay-700
+          transition-all duration-700 delay-700 ease-[cubic-bezier(0.22,1,0.36,1)]
           left-4 right-4 bottom-16
           sm:bottom-auto sm:left-[10vw] sm:right-[10vw] sm:top-[60vh]
           lg:top-[clamp(1.2rem,60vh,30.75rem)] lg:left-[clamp(1.2rem,20vw,15.5rem)] lg:right-[clamp(1.2rem,20vw,16.5rem)]
@@ -132,8 +136,17 @@ export default function HeroSection() {
       </div>
 
       {/* ── Scroll hint ── */}
-      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-30 animate-float hidden md:block pointer-events-none">
-        <div className="w-px h-10 bg-linear-to-b from-transparent to-white/40 mx-auto" />
+      <div
+        className={`absolute bottom-4 left-1/2 -translate-x-1/2 z-30 hidden md:flex flex-col items-center gap-2
+          pointer-events-none transition-all duration-700 delay-1000 ease-[cubic-bezier(0.22,1,0.36,1)]
+          ${loaded ? "opacity-100" : "opacity-0"}`}
+      >
+        <span className="font-inter text-[9px] uppercase tracking-[0.32em] text-white/55">
+          Scroll
+        </span>
+        <div className="relative h-10 w-px overflow-hidden bg-white/15">
+          <div className="absolute inset-x-0 top-0 h-1/2 animate-float bg-linear-to-b from-transparent via-white/80 to-transparent" />
+        </div>
       </div>
 
     </section>

@@ -1,35 +1,30 @@
 "use client";
 
-import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
+import Image from "next/image";
+import { ArrowRight, Calendar, MapPin } from "lucide-react";
 
-function useInView(threshold = 0.12) {
-  const ref = useRef<HTMLDivElement>(null);
+function useInView<T extends HTMLElement = HTMLDivElement>(threshold = 0.12) {
+  const ref = useRef<T | null>(null);
   const [inView, setInView] = useState(false);
+
   useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    const obs = new IntersectionObserver(
-      ([e]) => { if (e.isIntersecting) setInView(true); },
-      { threshold }
+    const element = ref.current;
+    if (!element) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) setInView(true);
+      },
+      { threshold },
     );
-    obs.observe(el);
-    return () => obs.disconnect();
+
+    observer.observe(element);
+    return () => observer.disconnect();
   }, [threshold]);
+
   return { ref, inView };
 }
-
-const ArrowRight = () => (
-  <svg width="13" height="13" viewBox="0 0 12 12" fill="none">
-    <path
-      d="M1 6h10M6 1l5 5-5 5"
-      stroke="currentColor"
-      strokeWidth="1.8"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-  </svg>
-);
 
 const works = [
   {
@@ -38,21 +33,21 @@ const works = [
     label: "Pinnacle Business Park",
     title: "Brand Photoshoot",
     description:
-      "A brand campaign shot at one of Bangalore's premier business destinations — capturing confidence, couture, and camera presence.",
-    cta: "View Campaign",
+      "A brand campaign shot at one of Bangalore's premier business destinations, balancing couture, confidence, and polished camera presence.",
+    cta: "View Gallery",
     photo: "/images/featured_works/e643c18c911698d2b1c6f26951bab888.jpg",
-    pos: "15% 15%",
+    pos: "50% 16%",
   },
   {
     num: "02",
-    date: "Dec 18 · 2024",
+    date: "Dec 18, 2024",
     label: "India Kids Fashion Week",
     title: "Runway Show",
     description:
-      "Taking the stage at IKFW Season 11 — a showcase of poise and grace that brought the crowd to its feet.",
-    cta: "Watch the Reel",
+      "A poised walk at IKFW Season 11 with expressive stage presence, graceful movement, and a memorable runway finish.",
+    cta: "See More",
     photo: "/images/featured_works/d67b374abf8d99540107eef87e4b9f71.jpg",
-    pos: "center center",
+    pos: "50% 14%",
   },
 ];
 
@@ -63,22 +58,25 @@ function WorkRow({
   work: (typeof works)[0];
   reverse: boolean;
 }) {
-  const { ref, inView } = useInView();
+  const { ref, inView } = useInView<HTMLElement>();
 
   return (
-    <div
+    <article
       ref={ref}
-      className={`flex flex-col ${reverse ? "md:flex-row-reverse" : "md:flex-row"} items-stretch gap-6 sm:gap-8 lg:gap-14`}
+      className={`grid gap-6 lg:grid-cols-12 lg:items-center lg:gap-10 ${
+        reverse ? "" : ""
+      }`}
     >
-      {/* Photo */}
       <div
-        className={`md:w-[58%] relative overflow-hidden rounded-2xl sm:rounded-3xl
-          aspect-3/4 sm:aspect-4/3 md:aspect-auto md:min-h-110 lg:min-h-130
-          group transition-all duration-700 ease-out
-          ${inView
-            ? "opacity-100 translate-x-0"
-            : `opacity-0 ${reverse ? "translate-x-10" : "-translate-x-10"}`
-          }`}
+        className={`image-frame group relative aspect-[4/5] min-h-[420px] transition-all duration-700 sm:aspect-[5/4] lg:col-span-7 lg:min-h-[600px] ${
+          reverse ? "lg:order-2" : ""
+        } ${
+          inView
+            ? "translate-y-0 opacity-100"
+            : reverse
+              ? "translate-y-8 opacity-0 lg:translate-x-10"
+              : "translate-y-8 opacity-0 lg:-translate-x-10"
+        }`}
       >
         <Image
           src={work.photo}
@@ -86,51 +84,52 @@ function WorkRow({
           fill
           className="object-cover transition-transform duration-700 group-hover:scale-[1.04]"
           style={{ objectPosition: work.pos }}
-          sizes="(max-width: 768px) 100vw, 58vw"
+          sizes="(max-width: 1024px) 100vw, 58vw"
         />
-        <div className="absolute inset-0 bg-linear-to-t from-black/20 to-transparent" />
+        <div className="absolute inset-0 bg-[linear-gradient(180deg,transparent_45%,rgba(0,0,0,0.55)_100%)]" />
       </div>
 
-      {/* Content */}
       <div
-        className={`md:w-[42%] flex flex-col justify-center
-          ${reverse ? "md:pr-4 lg:pr-8" : "md:pl-4 lg:pl-8"}
-          transition-all duration-700 ease-out delay-150
-          ${inView ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}
+        className={`transition-all delay-150 duration-700 lg:col-span-5 ${
+          reverse ? "lg:order-1 lg:pr-8" : "lg:pl-8"
+        } ${inView ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0"}`}
       >
-        <span className="font-bebas text-[#c9a84c] leading-none mb-3 sm:mb-4 select-none
-          text-[clamp(2.5rem,6vw,5.5rem)]">
+        <span className="mb-5 inline-flex h-12 w-12 items-center justify-center border border-[#c9a84c]/50 font-bebas text-3xl leading-none text-[#c9a84c]">
           {work.num}
         </span>
-        <p className="font-inter text-white/35 uppercase tracking-[0.32em] text-[9px] mb-1">
-          {work.date}
-        </p>
-        <p className="font-inter text-white/50 uppercase tracking-[0.2em] text-[10px] mb-4">
-          {work.label}
-        </p>
-        <h3 className="font-bebas text-white leading-none tracking-wide mb-4 sm:mb-5
-          text-[clamp(2rem,4.5vw,3.8rem)]">
+
+        <div className="mb-4 flex flex-wrap gap-3 font-inter text-[10px] uppercase tracking-[0.18em] text-white/42">
+          <span className="inline-flex items-center gap-2">
+            <Calendar size={13} strokeWidth={1.7} />
+            {work.date}
+          </span>
+          <span className="inline-flex items-center gap-2">
+            <MapPin size={13} strokeWidth={1.7} />
+            {work.label}
+          </span>
+        </div>
+
+        <h3 className="font-bebas text-[clamp(3rem,7vw,5.25rem)] leading-[0.86] text-white">
           {work.title}
         </h3>
-        <div className="w-10 h-px bg-[#c9a84c] mb-4 sm:mb-5" />
-        <p className="font-inter text-white/50 text-[13px] leading-[1.75] mb-7 sm:mb-8 max-w-full sm:max-w-xs">
+        <div className="my-5 h-px w-12 bg-[#c9a84c]" />
+        <p className="max-w-md font-inter text-sm leading-7 text-white/60 sm:text-base">
           {work.description}
         </p>
+
         <a
-          href="#"
-          className="group/btn inline-flex items-center gap-2.5 w-fit
-            font-inter text-[10px] uppercase tracking-[0.26em]
-            text-white border border-white/20
-            hover:border-[#c9a84c] hover:text-[#c9a84c]
-            px-6 py-3 rounded-full transition-all duration-300"
+          href="#gallery"
+          className="group mt-7 inline-flex h-12 items-center gap-3 rounded-full border border-white/14 px-6 font-inter text-[10px] uppercase tracking-[0.2em] text-white/78 transition duration-300 hover:border-[#c9a84c]/70 hover:text-[#c9a84c]"
         >
           {work.cta}
-          <span className="transition-transform duration-300 group-hover/btn:translate-x-1">
-            <ArrowRight />
-          </span>
+          <ArrowRight
+            size={15}
+            strokeWidth={1.8}
+            className="transition-transform duration-300 group-hover:translate-x-1"
+          />
         </a>
       </div>
-    </div>
+    </article>
   );
 }
 
@@ -138,32 +137,28 @@ export default function FeaturedWorkSection() {
   const { ref, inView } = useInView();
 
   return (
-    <section className="bg-black py-16 sm:py-24 lg:py-32 px-5 sm:px-8 lg:px-16 overflow-hidden">
-      <div className="max-w-6xl mx-auto">
-
-        {/* Header */}
+    <section className="bg-[#050505] px-5 py-16 sm:px-8 sm:py-20 lg:px-16 lg:py-28">
+      <div className="section-shell">
         <div
           ref={ref}
-          className={`mb-10 sm:mb-14 lg:mb-24 transition-all duration-700 ease-out
-            ${inView ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}
+          className={`mb-12 transition-all duration-700 sm:mb-16 lg:mb-24 ${
+            inView ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0"
+          }`}
         >
-          <p className="font-inter text-[#c9a84c] text-[10px] tracking-[0.38em] uppercase mb-3">
+          <p className="mb-3 font-inter text-[10px] uppercase tracking-[0.28em] text-[#c9a84c]">
             Portfolio
           </p>
-          <h2 className="font-bebas text-white leading-[0.88] tracking-[-0.01em]
-            text-[clamp(4rem,10vw,9rem)]">
-            FEATURED<br />WORK
+          <h2 className="font-bebas text-[clamp(4rem,12vw,9rem)] leading-[0.82] text-white">
+            Featured Work
           </h2>
-          <div className="w-full h-px bg-white/10 mt-8" />
+          <div className="mt-8 h-px w-full bg-white/10" />
         </div>
 
-        {/* Rows */}
-        <div className="flex flex-col gap-12 sm:gap-20 lg:gap-32">
-          {works.map((work, i) => (
-            <WorkRow key={work.num} work={work} reverse={i % 2 === 1} />
+        <div className="flex flex-col gap-16 sm:gap-20 lg:gap-28">
+          {works.map((work, index) => (
+            <WorkRow key={work.num} work={work} reverse={index % 2 === 1} />
           ))}
         </div>
-
       </div>
     </section>
   );
