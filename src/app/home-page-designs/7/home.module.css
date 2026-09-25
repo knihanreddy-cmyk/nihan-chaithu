@@ -1,0 +1,561 @@
+/* Home option 7 — Soft Arches. Ported from h07.html; :root/html/body map onto .root (the template's .page). */
+
+.root {
+  color-scheme: light;
+  --linen: #efe8df;
+  --oat: #f7f3ee;
+  --sand: #dccfbf;
+  --mocha: #5a4b40;
+  --cocoa: #3b2f27;
+  --blush: #e9cfc7;
+  --sage: #c9d2c0;
+  --display: var(--f-italiana), "Didot", Georgia, serif;
+  --body: var(--f-mulish), "Helvetica Neue", Arial, sans-serif;
+  --flour: var(--f-cormorant), Georgia, serif;
+  --aw: max(170px, min(24vw, 330px, calc((100svh - 330px) * 0.64)));
+  --ease: cubic-bezier(0.22, 0.8, 0.26, 1);
+  --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .35 0 0 0 0 .29 0 0 0 0 .25 0 0 0 .5 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+
+  position: relative;
+  isolation: isolate;
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  color: var(--cocoa);
+  font-family: var(--body);
+  font-size: 16px;
+  font-weight: 400;
+  line-height: normal;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: auto;
+  overflow-x: clip;
+  background:
+    radial-gradient(40% 55% at 22% 58%, rgba(233, 207, 199, 0.55), rgba(233, 207, 199, 0) 70%),
+    radial-gradient(40% 55% at 78% 58%, rgba(201, 210, 192, 0.6), rgba(201, 210, 192, 0) 70%),
+    linear-gradient(180deg, #f7f3ee 0%, #efe8df 60%, #e9e1d6 100%);
+  background-color: #efe8df;
+}
+.root::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: var(--grain);
+  opacity: 0.18;
+  pointer-events: none;
+  mix-blend-mode: multiply;
+}
+.root img {
+  max-width: 100%;
+  display: block;
+}
+:where(.root) h1,
+:where(.root) p {
+  margin: 0;
+}
+:where(.root) a {
+  color: inherit;
+  text-decoration: none;
+}
+.root ::selection {
+  background: #e9cfc7;
+  color: #3b2f27;
+}
+
+/* header */
+.top {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: clamp(16px, 2.4vw, 28px) clamp(16px, 4vw, 56px) 0;
+  animation: fade 1s var(--ease) backwards;
+}
+.mark {
+  margin: 0;
+  font-family: var(--display);
+  font-weight: 400;
+  font-size: clamp(1.15rem, 2vw, 1.5rem);
+  letter-spacing: 0.06em;
+  color: var(--cocoa);
+}
+.mark em {
+  font-family: var(--flour);
+  font-style: italic;
+  font-weight: 400;
+  color: var(--mocha);
+  font-size: 1.08em;
+  margin: 0 0.08em;
+}
+.top__right {
+  margin: 0;
+  font-size: 0.66rem;
+  font-weight: 600;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--mocha);
+}
+
+/* main */
+.stage {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(12px, 3vh, 36px) 16px 0;
+}
+.meet {
+  margin: 0 0 clamp(14px, 3vh, 30px);
+  font-family: var(--flour);
+  font-style: italic;
+  font-weight: 400;
+  font-size: clamp(1.3rem, 2.4vw, 1.75rem);
+  color: var(--mocha);
+  letter-spacing: 0.01em;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  animation: fade 1s var(--ease) 0.15s backwards;
+}
+.meet::before,
+.meet::after {
+  content: "";
+  width: 40px;
+  height: 1px;
+  background: var(--sand);
+}
+
+.pair {
+  display: grid;
+  grid-template-columns: auto auto auto;
+  align-items: start;
+  justify-content: center;
+  gap: clamp(10px, 4vw, 64px);
+}
+.and {
+  align-self: center;
+  margin-top: calc(var(--aw) * -0.2);
+  font-family: var(--flour);
+  font-style: italic;
+  font-size: clamp(1.3rem, 2.6vw, 2rem);
+  color: var(--mocha);
+  animation: fade 0.8s var(--ease) 0.6s backwards;
+}
+
+.choice {
+  --tint: var(--blush);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-decoration: none;
+  color: var(--cocoa);
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    opacity 0.6s var(--ease),
+    transform 0.6s var(--ease);
+}
+.choice--n {
+  --tint: var(--sage);
+}
+
+.float {
+  display: block;
+  animation: bob 7s ease-in-out infinite alternate;
+}
+.choice--n .float {
+  animation-delay: -3.5s;
+  animation-duration: 7.8s;
+}
+
+.arch {
+  position: relative;
+  display: block;
+  width: var(--aw);
+  height: calc(var(--aw) * 1.5);
+  transition: transform 0.8s var(--ease);
+}
+.arch::before {
+  /* diffused shadow + glow rim, arch shaped */
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  border-radius: calc(var(--aw) / 2) calc(var(--aw) / 2) 14px 14px;
+  box-shadow:
+    0 34px 60px -30px rgba(59, 47, 39, 0.42),
+    0 12px 26px -16px rgba(59, 47, 39, 0.28),
+    0 0 0 0 var(--tint);
+  transition: box-shadow 0.8s var(--ease);
+  animation: fade 0.8s ease 0.5s backwards;
+}
+.choice--n .arch::before {
+  animation-delay: 0.7s;
+}
+.halo {
+  position: absolute;
+  inset: -11px;
+  z-index: 0;
+  pointer-events: none;
+  border: 1px solid rgba(90, 75, 64, 0.28);
+  border-radius: calc(var(--aw) / 2 + 11px) calc(var(--aw) / 2 + 11px) 22px 22px;
+  transition:
+    border-color 0.8s var(--ease),
+    inset 0.8s var(--ease);
+  animation: fade 0.8s ease 0.6s backwards;
+}
+.choice--n .halo {
+  animation-delay: 0.75s;
+}
+.arch__frame {
+  position: relative;
+  z-index: 1;
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  border-radius: calc(var(--aw) / 2) calc(var(--aw) / 2) 14px 14px;
+  background: var(--tint);
+  animation: grow 1.05s cubic-bezier(0.3, 0.75, 0.2, 1) 0.1s backwards;
+}
+.choice--n .arch__frame {
+  animation-delay: 0.35s;
+}
+.arch__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 22%;
+  max-width: none;
+  animation: settle 1.4s var(--ease) 0.1s backwards;
+  transition: transform 1.2s var(--ease);
+}
+
+/* Nihan placeholder in sage */
+.portrait--placeholder {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background:
+    radial-gradient(80% 50% at 50% 26%, rgba(247, 243, 238, 0.75), rgba(247, 243, 238, 0) 70%),
+    linear-gradient(180deg, #d6ddce 0%, #c9d2c0 55%, #b9c3ae 100%);
+  color: var(--cocoa);
+  animation: settle 1.4s var(--ease) 0.35s backwards;
+}
+.portrait--placeholder::before {
+  content: "";
+  position: absolute;
+  inset: 12px;
+  border: 1px solid rgba(59, 47, 39, 0.2);
+  border-radius: calc(var(--aw) / 2 - 12px) calc(var(--aw) / 2 - 12px) 8px 8px;
+}
+.portrait--placeholder::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: var(--grain);
+  opacity: 0.35;
+  mix-blend-mode: multiply;
+}
+.ph__n {
+  font-family: var(--display);
+  font-size: calc(var(--aw) * 0.62);
+  line-height: 0.9;
+  color: rgba(59, 47, 39, 0.82);
+  margin-top: 6%;
+}
+.ph__name {
+  font-family: var(--display);
+  font-size: calc(var(--aw) * 0.11);
+  letter-spacing: 0.32em;
+  margin: 4% 0 0 0.32em;
+  color: var(--mocha);
+}
+.ph__rule {
+  width: 28px;
+  height: 1px;
+  background: rgba(59, 47, 39, 0.4);
+  margin: 8% 0 5%;
+}
+.ph__cap {
+  font-family: var(--flour);
+  font-style: italic;
+  font-size: clamp(0.85rem, calc(var(--aw) * 0.058), 1.1rem);
+  color: var(--mocha);
+}
+
+/* label */
+.label {
+  margin-top: clamp(20px, 3.4vh, 34px);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  animation: up 0.8s var(--ease) 0.55s backwards;
+}
+.choice--n .label {
+  animation-delay: 0.7s;
+}
+.label__name {
+  position: relative;
+  font-family: var(--display);
+  font-weight: 400;
+  font-size: clamp(1.7rem, 3.4vw, 2.9rem);
+  line-height: 1.05;
+  letter-spacing: 0.03em;
+  padding-bottom: 0.18em;
+}
+.label__name::after {
+  content: "";
+  position: absolute;
+  left: 8%;
+  right: 8%;
+  bottom: 0;
+  height: 1px;
+  background: var(--mocha);
+  transform: scaleX(0.18);
+  transition: transform 0.8s var(--ease);
+}
+.label__role {
+  margin-top: 12px;
+  font-size: 0.64rem;
+  font-weight: 700;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--mocha);
+}
+.label__cta {
+  margin-top: 6px;
+  font-family: var(--flour);
+  font-style: italic;
+  font-size: 1.08rem;
+  color: var(--mocha);
+  display: inline-flex;
+  gap: 8px;
+  align-items: center;
+}
+.label__cta span {
+  display: inline-block;
+  transition: transform 0.6s var(--ease);
+}
+
+@media (hover: hover) {
+  .choice:hover .arch {
+    transform: translateY(-14px);
+  }
+  .choice:hover .arch::before {
+    box-shadow:
+      0 56px 80px -34px rgba(59, 47, 39, 0.5),
+      0 22px 36px -18px rgba(59, 47, 39, 0.32),
+      0 0 0 7px var(--tint);
+  }
+  .choice:hover .halo {
+    border-color: rgba(90, 75, 64, 0.5);
+  }
+  .choice:hover .arch__img {
+    transform: scale(1.04);
+  }
+  .choice:hover .label__name::after {
+    transform: scaleX(1);
+  }
+  .choice:hover .label__cta span {
+    transform: translateX(5px);
+  }
+}
+@media (hover: none) {
+  .label__name::after {
+    transform: scaleX(0.6);
+  }
+}
+.choice:focus-visible .arch {
+  transform: translateY(-14px);
+}
+.choice:focus-visible .arch::before {
+  box-shadow:
+    0 56px 80px -34px rgba(59, 47, 39, 0.5),
+    0 0 0 7px var(--tint);
+}
+.choice:focus-visible .arch__frame {
+  outline: 2px solid var(--cocoa);
+  outline-offset: 18px;
+}
+.choice:focus-visible .label__name::after {
+  transform: scaleX(1);
+}
+
+/* leaving */
+.stage.is-leaving .choice {
+  pointer-events: none;
+}
+.stage.is-leaving .choice:not(.is-chosen) {
+  opacity: 0;
+  transform: translateY(18px) scale(0.96);
+}
+.stage.is-leaving .choice.is-chosen .arch__frame {
+  visibility: hidden;
+}
+.stage.is-leaving .choice.is-chosen .label,
+.stage.is-leaving .and,
+.stage.is-leaving .meet {
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+/* footer */
+.foot {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 6px 24px;
+  margin: clamp(18px, 4vh, 40px) clamp(16px, 4vw, 56px) 0;
+  padding: 16px 0 clamp(16px, 2.4vw, 24px);
+  border-top: 1px solid rgba(90, 75, 64, 0.18);
+  font-size: 0.64rem;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--mocha);
+  animation: fade 0.8s ease 0.7s backwards;
+}
+.foot p {
+  margin: 0;
+}
+.foot em {
+  font-family: var(--flour);
+  font-style: italic;
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: 0.02em;
+  font-size: 1.25em;
+}
+.foot__link {
+  color: inherit;
+  text-decoration: none;
+  border-bottom: 1px solid rgba(90, 75, 64, 0.3);
+  transition:
+    color 0.3s ease,
+    border-color 0.3s ease;
+}
+.foot__link:hover {
+  color: var(--cocoa);
+  border-color: var(--cocoa);
+}
+.foot__link:focus-visible {
+  outline: 2px solid var(--cocoa);
+  outline-offset: 4px;
+}
+
+/* transition: the chosen arch frame is cloned into this layer and grown to fill the viewport */
+.layer {
+  display: contents;
+}
+.takeover {
+  position: fixed;
+  z-index: 40;
+  margin: 0;
+  overflow: hidden;
+  pointer-events: none;
+  visibility: visible !important;
+  animation: none !important;
+}
+.takeover * {
+  animation: none !important;
+}
+
+/* keyframes (end state = resting CSS) */
+@keyframes fade {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes up {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+}
+@keyframes grow {
+  from {
+    clip-path: inset(100% 0 0 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+@keyframes settle {
+  from {
+    transform: scale(1.14);
+  }
+}
+@keyframes bob {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(-9px);
+  }
+}
+
+/* mobile */
+@media (max-width: 640px) {
+  .root {
+    --aw: min(39vw, 250px);
+  }
+  .top__right {
+    display: none;
+  }
+  .pair {
+    gap: 8px;
+  }
+  .and {
+    font-size: 1.1rem;
+  }
+  .label__name {
+    font-size: clamp(1.3rem, 6.4vw, 1.8rem);
+  }
+  .label__role {
+    font-size: 0.56rem;
+    letter-spacing: 0.2em;
+  }
+  .label__cta {
+    font-size: 0.98rem;
+  }
+  .halo {
+    inset: -7px;
+    border-radius: calc(var(--aw) / 2 + 7px) calc(var(--aw) / 2 + 7px) 18px 18px;
+  }
+  .ph__name {
+    letter-spacing: 0.24em;
+  }
+  .foot {
+    flex-direction: column;
+    letter-spacing: 0.16em;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .root,
+  .root::before,
+  .root *,
+  .root *::before,
+  .root *::after {
+    animation: none !important;
+  }
+  .arch,
+  .arch::before,
+  .label__name::after,
+  .arch__img,
+  .choice {
+    transition-duration: 0.01s !important;
+  }
+}
