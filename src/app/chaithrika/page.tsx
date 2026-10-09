@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import PortfolioHero from "@/components/portfolio/PortfolioHero";
+import Design10 from "../design-10/Design10";
+import { design10Fonts } from "../design-10/fonts";
 
 export const metadata: Metadata = {
   title: "Chaithrika - Model & Actress",
@@ -8,5 +9,5 @@ export const metadata: Metadata = {
 };
 
 export default function ChaithrikaPage() {
-  return <PortfolioHero />;
+  return <Design10 fontClassName={design10Fonts} preview={false} />;
 }

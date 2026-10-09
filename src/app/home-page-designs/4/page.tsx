@@ -1,21 +1,6 @@
 import type { Metadata } from "next";
-import { DM_Sans, Instrument_Serif } from "next/font/google";
 import Home4 from "./Home4";
-
-const dmSans = DM_Sans({
-  subsets: ["latin"],
-  axes: ["opsz"],
-  variable: "--f-dm-sans",
-  display: "swap",
-});
-
-const instrumentSerif = Instrument_Serif({
-  subsets: ["latin"],
-  weight: "400",
-  style: ["normal", "italic"],
-  variable: "--f-instrument",
-  display: "swap",
-});
+import { home4Fonts } from "./fonts";
 
 export const metadata: Metadata = {
   title: "Home option 4 · Glass Portals — Chaithrika & Nihan",
@@ -24,5 +9,5 @@ export const metadata: Metadata = {
 };
 
 export default function Page() {
-  return <Home4 fontClassName={[dmSans.variable, instrumentSerif.variable].join(" ")} />;
+  return <Home4 fontClassName={home4Fonts} />;
 }

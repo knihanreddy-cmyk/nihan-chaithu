@@ -1,21 +1,6 @@
 import type { Metadata } from "next";
-import { Bricolage_Grotesque, Instrument_Serif } from "next/font/google";
 import Design10 from "./Design10";
-
-const bricolage = Bricolage_Grotesque({
-  subsets: ["latin"],
-  axes: ["opsz", "wdth"],
-  variable: "--f-sans",
-  display: "swap",
-});
-
-const instrumentSerif = Instrument_Serif({
-  subsets: ["latin"],
-  weight: "400",
-  style: ["normal", "italic"],
-  variable: "--f-serif",
-  display: "swap",
-});
+import { design10Fonts } from "./fonts";
 
 export const metadata: Metadata = {
   title: "Design 10 · Ultra Premium Creative — Charming Chaithrika",
@@ -24,5 +9,5 @@ export const metadata: Metadata = {
 };
 
 export default function Page() {
-  return <Design10 fontClassName={[bricolage.variable, instrumentSerif.variable].join(" ")} />;
+  return <Design10 fontClassName={design10Fonts} />;
 }

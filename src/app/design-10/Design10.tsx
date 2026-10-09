@@ -233,7 +233,14 @@ function Cursor() {
   );
 }
 
-export default function Design10({ fontClassName }: { fontClassName: string }) {
+export default function Design10({
+  fontClassName,
+  preview = true,
+}: {
+  fontClassName: string;
+  /** Preview mode (/design-10) shows the design-option footer line; the live /chaithrika page links home instead. */
+  preview?: boolean;
+}) {
   const ready = useHydrated();
   const reduceMotion = useReducedMotion();
   const fine = useFinePointer();
@@ -465,6 +472,11 @@ export default function Design10({ fontClassName }: { fontClassName: string }) {
           </a>
           <nav aria-label="Primary">
             <ul className={cx("links")}>
+              {!preview && (
+                <li>
+                  <Link href="/">Home</Link>
+                </li>
+              )}
               {NAV.map(([href, label]) => (
                 <li key={href}>
                   <a href={href}>{label}</a>
@@ -488,6 +500,13 @@ export default function Design10({ fontClassName }: { fontClassName: string }) {
         </div>
         <nav className={cx("mnav")} id="mnav" aria-label="Mobile" hidden={!menuOpen}>
           <ul>
+            {!preview && (
+              <li>
+                <Link href="/" onClick={closeMenu}>
+                  Home
+                </Link>
+              </li>
+            )}
             {NAV.map(([href, label]) => (
               <li key={href}>
                 <a href={href} onClick={closeMenu}>
@@ -888,12 +907,19 @@ export default function Design10({ fontClassName }: { fontClassName: string }) {
               <li>
                 <a href="#top">Back to top</a>
               </li>
+              {!preview && (
+                <li>
+                  <Link href="/">Family home</Link>
+                </li>
+              )}
             </ul>
             <p>&copy; Chaithrika · Child model &amp; actress, India</p>
-            <p className={cx("foot-design")}>
-              <span>Design option 10 of 10 — Ultra Premium Creative</span>
-              <Link href="/designs">View all designs</Link>
-            </p>
+            {preview && (
+              <p className={cx("foot-design")}>
+                <span>Design option 10 of 10 — Ultra Premium Creative</span>
+                <Link href="/designs">View all designs</Link>
+              </p>
+            )}
           </div>
         </div>
       </footer>

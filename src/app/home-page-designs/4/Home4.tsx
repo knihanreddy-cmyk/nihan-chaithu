@@ -46,7 +46,14 @@ function Arrow() {
   );
 }
 
-export default function Home4({ fontClassName }: { fontClassName: string }) {
+export default function Home4({
+  fontClassName,
+  preview = true,
+}: {
+  fontClassName: string;
+  /** Shows the "Home option 04 of 10" footer line used on /home-page-designs. */
+  preview?: boolean;
+}) {
   usePageBackground("#F3EFF4");
   const router = useRouter();
 
@@ -316,12 +323,14 @@ export default function Home4({ fontClassName }: { fontClassName: string }) {
 
         <footer className={styles.foot}>
           <span>Bookings managed by their parents</span>
-          <span className={styles.foot__r}>
-            <span className={styles.foot__opt}>Home option 04 of 10 &mdash; Glass Portals</span>
-            <Link className={styles.foot__link} href="/home-page-designs">
-              All home designs
-            </Link>
-          </span>
+          {preview && (
+            <span className={styles.foot__r}>
+              <span className={styles.foot__opt}>Home option 04 of 10 &mdash; Glass Portals</span>
+              <Link className={styles.foot__link} href="/home-page-designs">
+                All home designs
+              </Link>
+            </span>
+          )}
         </footer>
       </div>
 
