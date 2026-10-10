@@ -6,7 +6,8 @@ import styles from "./BirthdayCountdown.module.css";
 
 const SEEN_KEY = "cc-birthday-countdown-seen";
 const COUNT_FROM = 10;
-const GREETING_MS = 7000;
+/** How long the overlay stays after the lights come on, so the confetti can fall. */
+const CONFETTI_MS = 4200;
 const LEAVE_MS = 700;
 const RING_R = 46;
 const RING_LEN = 2 * Math.PI * RING_R;
@@ -184,8 +185,8 @@ function playPop(ac: AudioContext) {
 /**
  * Chaithrika's birthday opening, played over the real homepage: the page loads
  * dimmed ("lights off"), a 10-second countdown runs on top, then the lights come
- * on, confetti fires from both bottom corners and the greeting shows over the
- * lit homepage before fading away. Plays once per browser session;
+ * on and confetti fires from both bottom corners over the lit homepage before
+ * the overlay clears. Plays once per browser session;
  * `?intro=1` forces it and `?intro=0` skips it.
  */
 export default function BirthdayCountdown({ children }: { children: ReactNode }) {
@@ -275,7 +276,7 @@ export default function BirthdayCountdown({ children }: { children: ReactNode })
       timers.push(window.setTimeout(() => confetti?.burst("right", Math.round(big * 0.45), 0.85), 900));
       if (soundRef.current && audioRef.current) playPop(audioRef.current);
     }
-    timers.push(window.setTimeout(finish, GREETING_MS));
+    timers.push(window.setTimeout(finish, reduced ? 0 : CONFETTI_MS));
     return () => {
       timers.forEach(window.clearTimeout);
       // Let falling confetti finish if we're only moving on to "leaving".
@@ -338,7 +339,7 @@ export default function BirthdayCountdown({ children }: { children: ReactNode })
       </div>
 
       {phase !== "done" && (
-        <div className={layerClass} role="dialog" aria-modal={phase === "countdown"} aria-label="Happy Birthday, Chaithrika">
+        <div className={layerClass} role="dialog" aria-modal={phase === "countdown"} aria-label="Countdown">
           <div className={styles.dark} aria-hidden="true" />
           <div className={`${styles.spot} ${styles.spotL}`} aria-hidden="true" />
           <div className={`${styles.spot} ${styles.spotR}`} aria-hidden="true" />
@@ -364,19 +365,6 @@ export default function BirthdayCountdown({ children }: { children: ReactNode })
             </div>
             <p className={styles.hint}>Something special is about to light up.</p>
             <span className={styles.sr}>A ten-second birthday countdown is playing. Press Skip or Escape to skip it.</span>
-          </div>
-
-          <div className={styles.greet} aria-hidden={phase === "countdown"}>
-            <div className={styles.card} aria-live="polite">
-              <p className={styles.hb}>Happy Birthday</p>
-              <p className={styles.name}>Chaithrika</p>
-              <p className={styles.sub}>A little gift, made just for you. With love.</p>
-              {phase !== "countdown" && (
-                <button type="button" className={styles.close} onClick={finish} aria-label="Close the birthday greeting">
-                  ×
-                </button>
-              )}
-            </div>
           </div>
 
           <div ref={strobeRef} className={styles.strobe} aria-hidden="true" />

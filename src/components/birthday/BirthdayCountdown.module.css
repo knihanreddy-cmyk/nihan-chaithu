@@ -237,88 +237,6 @@
   pointer-events: none;
 }
 
-/* ---------- greeting over the lit homepage ---------- */
-
-.greet {
-  position: absolute;
-  inset: 0;
-  display: grid;
-  place-items: center;
-  padding: 24px 16px;
-  pointer-events: none;
-  opacity: 0;
-  transition: opacity 0.9s var(--ease);
-}
-
-.lit .greet {
-  opacity: 1;
-}
-
-.leaving .greet {
-  opacity: 0;
-  transition-duration: 0.7s;
-}
-
-.card {
-  position: relative;
-  display: grid;
-  justify-items: center;
-  gap: 10px;
-  padding: clamp(22px, 4vw, 40px) clamp(26px, 6vw, 64px);
-  text-align: center;
-  pointer-events: auto;
-  background: radial-gradient(ellipse at center, rgba(10, 8, 6, 0.72), rgba(10, 8, 6, 0.48) 70%);
-  border: 1px solid rgba(243, 227, 181, 0.3);
-  border-radius: 28px;
-  backdrop-filter: blur(10px) saturate(130%);
-  -webkit-backdrop-filter: blur(10px) saturate(130%);
-  box-shadow: 0 30px 80px -30px rgba(0, 0, 0, 0.6);
-  transform: translateY(14px) scale(0.97);
-  transition: transform 1s var(--ease);
-}
-
-.lit .card {
-  transform: none;
-}
-
-.hb {
-  margin: 0;
-  font-size: clamp(11px, 1.3vw, 13px);
-  font-weight: 600;
-  letter-spacing: 0.5em;
-  text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.86);
-}
-
-.name {
-  margin: 0;
-  font-family: var(--f-bday-display), "Bodoni Moda", Didot, serif;
-  font-style: italic;
-  font-weight: 500;
-  font-size: clamp(3rem, 11vw, 7.5rem);
-  line-height: 0.95;
-  letter-spacing: -0.01em;
-  background: linear-gradient(100deg, #f3e3b5 0%, #fff6dd 35%, #c98a7a 60%, #f3e3b5 90%);
-  background-size: 220% 100%;
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  animation: sheen 4s linear infinite;
-}
-
-@keyframes sheen {
-  to {
-    background-position: -220% 0;
-  }
-}
-
-.sub {
-  margin: 4px 0 0;
-  font-size: clamp(12px, 1.3vw, 14px);
-  letter-spacing: 0.06em;
-  color: rgba(255, 255, 255, 0.7);
-}
-
 /* ---------- controls ---------- */
 
 .controls {
@@ -351,32 +269,11 @@
   color: #0b0a09;
 }
 
-.btn:focus-visible,
-.close:focus-visible {
+.btn:focus-visible {
   outline: 2px solid var(--champagne);
   outline-offset: 3px;
 }
 
-.close {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  width: 34px;
-  height: 34px;
-  display: grid;
-  place-items: center;
-  border: 0;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.1);
-  color: #fff;
-  font-size: 18px;
-  line-height: 1;
-  cursor: pointer;
-}
-
-.close:hover {
-  background: rgba(255, 255, 255, 0.22);
-}
 
 .sr {
   position: absolute;
@@ -391,14 +288,11 @@
   .tick,
   .flash,
   .bigFlash,
-  .lit .spot,
-  .name {
+  .lit .spot {
     animation: none;
   }
   .dark,
   .countdown,
-  .greet,
-  .card,
   .ringFill {
     transition-duration: 0.01ms;
   }
