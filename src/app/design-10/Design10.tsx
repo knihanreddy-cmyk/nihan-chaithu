@@ -472,11 +472,6 @@ export default function Design10({
           </a>
           <nav aria-label="Primary">
             <ul className={cx("links")}>
-              {!preview && (
-                <li>
-                  <Link href="/">Home</Link>
-                </li>
-              )}
               {NAV.map(([href, label]) => (
                 <li key={href}>
                   <a href={href}>{label}</a>
@@ -484,9 +479,15 @@ export default function Design10({
               ))}
             </ul>
           </nav>
-          <a className={cx("nbook")} href="#contact">
-            Book
-          </a>
+          {preview ? (
+            <a className={cx("nbook")} href="#contact">
+              Book
+            </a>
+          ) : (
+            <Link className={cx("nbook")} href="/" aria-label="Back to the family homepage">
+              Home
+            </Link>
+          )}
           <button
             ref={burgerRef}
             className={cx("burger")}

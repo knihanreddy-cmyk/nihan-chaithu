@@ -501,9 +501,6 @@ export default function NihanJournal({ fontClassName }: { fontClassName: string 
                 Chaithrika ↗
               </Link>
             </nav>
-            <a className={styles.ticket} href="#contact">
-              Book Nihan
-            </a>
           </div>
 
           <button
@@ -546,9 +543,6 @@ export default function NihanJournal({ fontClassName }: { fontClassName: string 
               </li>
             ))}
           </ul>
-          <a className={c("ticket", "ticket-wide")} href="#contact" onClick={(e) => onDrawerLink(e, "contact")}>
-            Book Nihan
-          </a>
           <div className={styles["drawer-family"]}>
             <Link className={styles.fam} href="/" onClick={() => setMenuOpen(false)}>
               Home ↗
