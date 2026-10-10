@@ -292,10 +292,12 @@ export default function Home4({
               <span className={styles.portal__body}>
                 <span className={styles.portal__frame} ref={frameNRef}>
                   <Image
-                    src="/images/nihan/nihan-06.jpg"
-                    width={1063}
-                    height={1600}
-                    alt="Nihan in a navy embroidered kurta and sunglasses against a grey studio backdrop"
+                    src="/images/nihan/nihan-25.jpg"
+                    width={1600}
+                    height={1200}
+                    alt="Nihan in a checked shirt and sunglasses, sitting on the rocks by the sea under a cloudy sky"
+                    // Landscape photo in a tall frame: keep him (left of centre) in view.
+                    style={{ objectPosition: "27% 40%" }}
                     sizes="(max-width: 760px) min(92vw, 432px), (max-width: 1040px) 42vw, 410px"
                     preload
                   />
