@@ -16,9 +16,12 @@
   position: absolute;
   inset: 0;
   pointer-events: auto;
+  /* Nearly opaque and heavily blurred, so the homepage stays hidden until the lights come on. */
   background:
-    radial-gradient(ellipse 60% 50% at 50% 46%, rgba(20, 16, 12, 0.72), rgba(4, 4, 4, 0.94) 70%),
-    rgba(4, 4, 4, 0.55);
+    radial-gradient(ellipse 60% 50% at 50% 46%, rgba(20, 16, 12, 0.9), rgba(4, 4, 4, 0.99) 70%),
+    rgba(4, 4, 4, 0.9);
+  backdrop-filter: blur(28px) saturate(60%);
+  -webkit-backdrop-filter: blur(28px) saturate(60%);
   transition: opacity 1.4s var(--ease);
 }
 
