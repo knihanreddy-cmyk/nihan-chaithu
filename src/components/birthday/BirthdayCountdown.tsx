@@ -11,9 +11,10 @@ import styles from "./BirthdayCountdown.module.css";
  */
 let playedThisPageLoad = false;
 
-const COUNT_FROM = 10;
-/** How long the overlay stays after the lights come on, so the confetti can fall. */
-const CONFETTI_MS = 4200;
+const COUNT_FROM = 15;
+/** How long the overlay stays after the lights come on, so the confetti can rise and fall. */
+const CONFETTI_MS = 6400;
+const GRAVITY = 0.32;
 const LEAVE_MS = 700;
 const RING_R = 46;
 const RING_LEN = 2 * Math.PI * RING_R;
@@ -67,11 +68,13 @@ function createConfetti(canvas: HTMLCanvasElement) {
 
   function burst(side: "left" | "right", count: number, power: number) {
     const fromLeft = side === "left";
-    const scale = Math.max(0.75, Math.min(1.25, h / 800));
     for (let i = 0; i < count; i++) {
-      // Aim up and inward: 50–80° above the horizon, towards the centre.
-      const angle = ((50 + Math.random() * 30) * Math.PI) / 180;
-      const speed = (11 + Math.random() * 11) * power * scale;
+      // Aim up and inward: 55–84° above the horizon, towards the centre.
+      const angle = ((55 + Math.random() * 29) * Math.PI) / 180;
+      // Pick how high this piece should climb (55%–110% of the screen) and launch fast
+      // enough to get there; the extra 18% makes up for air drag.
+      const peak = h * (0.55 + Math.random() * 0.55) * power;
+      const speed = Math.sqrt(2 * GRAVITY * peak) * 1.18 / Math.sin(angle);
       const strip = Math.random() < 0.28;
       pieces.push({
         x: fromLeft ? -6 : w + 6,
@@ -101,9 +104,10 @@ function createConfetti(canvas: HTMLCanvasElement) {
     ctx.clearRect(0, 0, w, h);
     pieces = pieces.filter((p) => p.y < h + 40 && p.x > -60 && p.x < w + 60);
     for (const p of pieces) {
-      p.vy += 0.32 * dt;
+      p.vy += GRAVITY * dt;
       p.vx *= Math.pow(0.985, dt);
-      p.vy *= Math.pow(0.988, dt);
+      // Light drag going up so pieces reach the top; more drag coming down so they flutter.
+      p.vy *= Math.pow(p.vy < 0 ? 0.995 : 0.975, dt);
       p.x += (p.vx + Math.sin(p.tilt) * 0.6) * dt;
       p.y += p.vy * dt;
       p.rot += p.vr * dt;
@@ -157,32 +161,83 @@ function playTick(ac: AudioContext, final: boolean) {
   osc.stop(t + 0.14);
 }
 
-function playPop(ac: AudioContext) {
-  const t = ac.currentTime;
-  const len = Math.floor(ac.sampleRate * 0.25);
+function noiseBuffer(ac: AudioContext, seconds: number, decay: number) {
+  const len = Math.floor(ac.sampleRate * seconds);
   const buffer = ac.createBuffer(1, len, ac.sampleRate);
   const data = buffer.getChannelData(0);
-  for (let i = 0; i < len; i++) data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 3);
-  const noise = ac.createBufferSource();
-  noise.buffer = buffer;
-  const filter = ac.createBiquadFilter();
-  filter.type = "bandpass";
-  filter.frequency.value = 1400;
+  for (let i = 0; i < len; i++) data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, decay);
+  return buffer;
+}
+
+/** A party-popper bang: a low thump plus a bright crack. `pan` is -1 (left) to 1 (right). */
+function playPopper(ac: AudioContext, strength: number, pan: number, delay = 0) {
+  const t = ac.currentTime + delay;
+  const out = ac.createStereoPanner();
+  out.pan.value = pan;
+  out.connect(ac.destination);
+
+  const thump = ac.createOscillator();
+  const thumpGain = ac.createGain();
+  thump.type = "sine";
+  thump.frequency.setValueAtTime(150, t);
+  thump.frequency.exponentialRampToValueAtTime(45, t + 0.18);
+  thumpGain.gain.setValueAtTime(0.0001, t);
+  thumpGain.gain.exponentialRampToValueAtTime(0.9 * strength, t + 0.008);
+  thumpGain.gain.exponentialRampToValueAtTime(0.0001, t + 0.25);
+  thump.connect(thumpGain).connect(out);
+  thump.start(t);
+  thump.stop(t + 0.3);
+
+  const crack = ac.createBufferSource();
+  crack.buffer = noiseBuffer(ac, 0.3, 4);
+  const hp = ac.createBiquadFilter();
+  hp.type = "highpass";
+  hp.frequency.value = 900;
+  const crackGain = ac.createGain();
+  crackGain.gain.value = 1.1 * strength;
+  crack.connect(hp).connect(crackGain).connect(out);
+  crack.start(t);
+}
+
+/** Paper confetti rustling and crackling as it flies, for `seconds`. */
+function playCrackle(ac: AudioContext, seconds: number, strength: number, delay = 0) {
+  const t = ac.currentTime + delay;
+  const len = Math.floor(ac.sampleRate * seconds);
+  const buffer = ac.createBuffer(2, len, ac.sampleRate);
+  for (let ch = 0; ch < 2; ch++) {
+    const data = buffer.getChannelData(ch);
+    for (let i = 0; i < len; i++) {
+      const fade = Math.pow(1 - i / len, 1.6);
+      // Sparse random clicks over a soft hiss.
+      const click = Math.random() < 0.004 ? (Math.random() * 2 - 1) * 0.9 : 0;
+      data[i] = (click + (Math.random() * 2 - 1) * 0.06) * fade;
+    }
+  }
+  const src = ac.createBufferSource();
+  src.buffer = buffer;
+  const bp = ac.createBiquadFilter();
+  bp.type = "bandpass";
+  bp.frequency.value = 3200;
+  bp.Q.value = 0.7;
   const gain = ac.createGain();
-  gain.gain.value = 0.5;
-  noise.connect(filter).connect(gain).connect(ac.destination);
-  noise.start(t);
-  // a little chime on top
-  [1568, 2093].forEach((f, i) => {
+  gain.gain.value = 0.9 * strength;
+  src.connect(bp).connect(gain).connect(ac.destination);
+  src.start(t);
+}
+
+/** A bright two-note chime for "lights on". */
+function playChime(ac: AudioContext, delay = 0) {
+  const t = ac.currentTime + delay;
+  [1568, 2093, 2637].forEach((f, i) => {
     const osc = ac.createOscillator();
     const g = ac.createGain();
     osc.frequency.value = f;
-    g.gain.setValueAtTime(0.0001, t + 0.15 + i * 0.09);
-    g.gain.exponentialRampToValueAtTime(0.08, t + 0.17 + i * 0.09);
-    g.gain.exponentialRampToValueAtTime(0.0001, t + 1.1 + i * 0.09);
+    g.gain.setValueAtTime(0.0001, t + i * 0.08);
+    g.gain.exponentialRampToValueAtTime(0.12, t + 0.02 + i * 0.08);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + 1.3 + i * 0.08);
     osc.connect(g).connect(ac.destination);
-    osc.start(t + 0.15 + i * 0.09);
-    osc.stop(t + 1.2 + i * 0.09);
+    osc.start(t + i * 0.08);
+    osc.stop(t + 1.4 + i * 0.08);
   });
 }
 
@@ -190,7 +245,7 @@ function playPop(ac: AudioContext) {
 
 /**
  * Chaithrika's birthday opening, played over the real homepage: the page loads
- * dimmed ("lights off"), a 10-second countdown runs on top, then the lights come
+ * dimmed ("lights off"), a 15-second countdown runs on top, then the lights come
  * on and confetti fires from both bottom corners over the lit homepage before
  * the overlay clears. Plays on every full page load (any refresh), not when
  * navigating back within the site; `?intro=0` skips it.
@@ -198,12 +253,43 @@ function playPop(ac: AudioContext) {
 export default function BirthdayCountdown({ children }: { children: ReactNode }) {
   const [phase, setPhase] = useState<Phase>("countdown");
   const [remaining, setRemaining] = useState(COUNT_FROM);
-  const [soundOn, setSoundOn] = useState(false);
+  const [soundOn, setSoundOn] = useState(true);
+  /** False until the browser lets audio play (after the visitor's first tap, click or key). */
+  const [unlocked, setUnlocked] = useState(false);
   const [reduced, setReduced] = useState(false);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const strobeRef = useRef<HTMLDivElement>(null);
   const audioRef = useRef<AudioContext | null>(null);
-  const soundRef = useRef(false);
+  const soundRef = useRef(true);
+
+  /** Returns the audio context only when sound is on and the browser has allowed it to play. */
+  const audio = useCallback(() => {
+    const ac = audioRef.current;
+    return soundRef.current && ac && ac.state === "running" ? ac : null;
+  }, []);
+
+  // Sound is on by default. Browsers block audio until the visitor interacts with the
+  // page, so create the context now and unlock it on the first tap, click or key.
+  useEffect(() => {
+    const AC =
+      window.AudioContext ?? (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
+    if (!AC) return;
+    const ac = new AC();
+    audioRef.current = ac;
+    ac.onstatechange = () => {
+      if (ac.state === "running") setUnlocked(true);
+    };
+    const unlock = () => {
+      if (soundRef.current) void ac.resume();
+    };
+    const events = ["pointerdown", "keydown", "touchstart"] as const;
+    events.forEach((e) => window.addEventListener(e, unlock, { passive: true }));
+    return () => {
+      events.forEach((e) => window.removeEventListener(e, unlock));
+      void ac.close();
+      audioRef.current = null;
+    };
+  }, []);
 
   // Decide on the client whether to play (the URL and page-load state are browser-only).
   useEffect(() => {
@@ -254,33 +340,62 @@ export default function BirthdayCountdown({ children }: { children: ReactNode })
   useEffect(() => {
     if (phase !== "countdown" || reduced) return;
     strobe(false);
-    if (soundRef.current && audioRef.current) playTick(audioRef.current, remaining === 1);
-  }, [phase, remaining, reduced, strobe]);
+    const ac = audio();
+    if (ac) playTick(ac, remaining === 1);
+  }, [phase, remaining, reduced, strobe, audio]);
 
-  // Lights on: big flash, corner blasts, then the greeting fades on its own.
+  // Lights on: big flash, a barrage of corner blasts with popper sounds, then the overlay clears.
   useEffect(() => {
     if (phase !== "lit") return;
     const timers: number[] = [];
+    const at = (ms: number, fn: () => void) => timers.push(window.setTimeout(fn, ms));
     let confetti: ReturnType<typeof createConfetti> | null = null;
     if (!reduced && canvasRef.current) {
       strobe(true);
       confetti = createConfetti(canvasRef.current);
+      const c = confetti;
       const mobile = window.innerWidth < 640;
-      const big = mobile ? 110 : 230;
-      confetti.burst("left", big, 1);
-      confetti.burst("right", big, 1);
-      timers.push(window.setTimeout(() => confetti?.burst("left", Math.round(big * 0.45), 0.85), 650));
-      timers.push(window.setTimeout(() => confetti?.burst("right", Math.round(big * 0.45), 0.85), 900));
-      if (soundRef.current && audioRef.current) playPop(audioRef.current);
+      const big = mobile ? 190 : 380;
+      const fire = (side: "left" | "right", count: number, power: number, loud: number) => {
+        c.burst(side, count, power);
+        const ac = audio();
+        if (ac) playPopper(ac, loud, side === "left" ? -0.7 : 0.7);
+      };
+
+      // The main double blast, with a chime and paper crackle.
+      fire("left", big, 1, 1);
+      fire("right", big, 1, 1);
+      const ac = audio();
+      if (ac) {
+        playChime(ac, 0.12);
+        playCrackle(ac, 3.2, 1, 0.05);
+      }
+      // Follow-up volleys from alternating corners.
+      at(380, () => {
+        fire("left", Math.round(big * 0.55), 0.95, 0.8);
+        fire("right", Math.round(big * 0.55), 0.95, 0.8);
+      });
+      at(850, () => fire("left", Math.round(big * 0.45), 0.9, 0.7));
+      at(1100, () => fire("right", Math.round(big * 0.45), 0.9, 0.7));
+      at(1600, () => {
+        fire("left", Math.round(big * 0.4), 0.85, 0.65);
+        fire("right", Math.round(big * 0.4), 0.85, 0.65);
+        const later = audio();
+        if (later) playCrackle(later, 2.4, 0.8);
+      });
+      // A short fountain of small bursts to keep it going.
+      for (let i = 0; i < 12; i++) {
+        at(2000 + i * 140, () => c.burst(i % 2 ? "right" : "left", mobile ? 10 : 18, 0.8));
+      }
     }
-    timers.push(window.setTimeout(finish, reduced ? 0 : CONFETTI_MS));
+    at(reduced ? 0 : CONFETTI_MS, finish);
     return () => {
       timers.forEach(window.clearTimeout);
       // Let falling confetti finish if we're only moving on to "leaving".
       const c = confetti;
       window.setTimeout(() => c?.destroy(), 4000);
     };
-  }, [phase, reduced, strobe, finish]);
+  }, [phase, reduced, strobe, finish, audio]);
 
   useEffect(() => {
     if (phase !== "leaving") return;
@@ -306,17 +421,17 @@ export default function BirthdayCountdown({ children }: { children: ReactNode })
     };
   }, [phase, lightsOn, finish]);
 
-  useEffect(() => () => void audioRef.current?.close(), []);
-
   function toggleSound() {
+    // Before the browser has allowed audio, this tap is what unlocks it: keep sound on.
+    if (soundRef.current && !unlocked) {
+      void audioRef.current?.resume();
+      return;
+    }
     const next = !soundRef.current;
     soundRef.current = next;
     setSoundOn(next);
-    if (next && !audioRef.current) {
-      const AC = window.AudioContext ?? (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
-      if (AC) audioRef.current = new AC();
-    }
-    void audioRef.current?.resume();
+    if (next) void audioRef.current?.resume();
+    else void audioRef.current?.suspend();
   }
 
   const layerClass = [
@@ -360,15 +475,23 @@ export default function BirthdayCountdown({ children }: { children: ReactNode })
                 {remaining}
               </span>
             </div>
-            <p className={styles.hint}>Something special is about to light up.</p>
-            <span className={styles.sr}>A ten-second birthday countdown is playing. Press Skip or Escape to skip it.</span>
+            <p className={styles.hint}>
+              Something special is about to light up.
+              {soundOn && !unlocked && (
+                <>
+                  <br />
+                  Tap anywhere to turn the sound on.
+                </>
+              )}
+            </p>
+            <span className={styles.sr}>A fifteen-second birthday countdown is playing. Press Skip or Escape to skip it.</span>
           </div>
 
           <div ref={strobeRef} className={styles.strobe} aria-hidden="true" />
 
           <div className={styles.controls}>
             <button type="button" className={styles.btn} onClick={toggleSound} aria-pressed={soundOn}>
-              {soundOn ? "Sound on" : "Sound off"}
+              {!soundOn ? "Sound off" : unlocked ? "Sound on" : "Tap for sound"}
             </button>
             {phase === "countdown" && (
               <button type="button" className={styles.btn} onClick={lightsOn}>
