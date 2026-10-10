@@ -253,9 +253,6 @@ function playChime(ac: AudioContext, delay = 0) {
 export default function BirthdayCountdown({ children }: { children: ReactNode }) {
   const [phase, setPhase] = useState<Phase>("countdown");
   const [remaining, setRemaining] = useState(COUNT_FROM);
-  const [soundOn, setSoundOn] = useState(true);
-  /** False until the browser lets audio play (after the visitor's first tap, click or key). */
-  const [unlocked, setUnlocked] = useState(false);
   const [reduced, setReduced] = useState(false);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const strobeRef = useRef<HTMLDivElement>(null);
@@ -276,9 +273,6 @@ export default function BirthdayCountdown({ children }: { children: ReactNode })
     if (!AC) return;
     const ac = new AC();
     audioRef.current = ac;
-    ac.onstatechange = () => {
-      if (ac.state === "running") setUnlocked(true);
-    };
     const unlock = () => {
       if (soundRef.current) void ac.resume();
     };
@@ -421,19 +415,6 @@ export default function BirthdayCountdown({ children }: { children: ReactNode })
     };
   }, [phase, lightsOn, finish]);
 
-  function toggleSound() {
-    // Before the browser has allowed audio, this tap is what unlocks it: keep sound on.
-    if (soundRef.current && !unlocked) {
-      void audioRef.current?.resume();
-      return;
-    }
-    const next = !soundRef.current;
-    soundRef.current = next;
-    setSoundOn(next);
-    if (next) void audioRef.current?.resume();
-    else void audioRef.current?.suspend();
-  }
-
   const layerClass = [
     styles.layer,
     birthdayFonts,
@@ -475,24 +456,13 @@ export default function BirthdayCountdown({ children }: { children: ReactNode })
                 {remaining}
               </span>
             </div>
-            <p className={styles.hint}>
-              Something special is about to light up.
-              {soundOn && !unlocked && (
-                <>
-                  <br />
-                  Tap anywhere to turn the sound on.
-                </>
-              )}
-            </p>
+            <p className={styles.hint}>Something special is about to light up.</p>
             <span className={styles.sr}>A fifteen-second birthday countdown is playing. Press Skip or Escape to skip it.</span>
           </div>
 
           <div ref={strobeRef} className={styles.strobe} aria-hidden="true" />
 
           <div className={styles.controls}>
-            <button type="button" className={styles.btn} onClick={toggleSound} aria-pressed={soundOn}>
-              {!soundOn ? "Sound off" : unlocked ? "Sound on" : "Tap for sound"}
-            </button>
             {phase === "countdown" && (
               <button type="button" className={styles.btn} onClick={lightsOn}>
                 Skip
