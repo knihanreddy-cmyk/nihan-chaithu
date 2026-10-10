@@ -4,7 +4,13 @@ import { useCallback, useEffect, useRef, useState, type ReactNode } from "react"
 import { birthdayFonts } from "./fonts";
 import styles from "./BirthdayCountdown.module.css";
 
-const SEEN_KEY = "cc-birthday-countdown-seen";
+/**
+ * Module state survives client-side navigation but resets on every full page
+ * load, so the countdown replays on any refresh (including Ctrl+Shift+R) but
+ * not when the visitor comes back to the homepage from another page.
+ */
+let playedThisPageLoad = false;
+
 const COUNT_FROM = 10;
 /** How long the overlay stays after the lights come on, so the confetti can fall. */
 const CONFETTI_MS = 4200;
@@ -186,8 +192,8 @@ function playPop(ac: AudioContext) {
  * Chaithrika's birthday opening, played over the real homepage: the page loads
  * dimmed ("lights off"), a 10-second countdown runs on top, then the lights come
  * on and confetti fires from both bottom corners over the lit homepage before
- * the overlay clears. Plays once per browser session;
- * `?intro=1` forces it and `?intro=0` skips it.
+ * the overlay clears. Plays on every full page load (any refresh), not when
+ * navigating back within the site; `?intro=0` skips it.
  */
 export default function BirthdayCountdown({ children }: { children: ReactNode }) {
   const [phase, setPhase] = useState<Phase>("countdown");
@@ -199,18 +205,12 @@ export default function BirthdayCountdown({ children }: { children: ReactNode })
   const audioRef = useRef<AudioContext | null>(null);
   const soundRef = useRef(false);
 
-  // Decide on the client whether to play (session storage and URL are browser-only).
+  // Decide on the client whether to play (the URL and page-load state are browser-only).
   useEffect(() => {
     const param = new URLSearchParams(window.location.search).get("intro");
-    let seen = false;
-    try {
-      seen = sessionStorage.getItem(SEEN_KEY) === "1";
-    } catch {
-      // Storage blocked (private mode): play it.
-    }
     /* eslint-disable react-hooks/set-state-in-effect -- depends on browser-only state */
     setReduced(window.matchMedia("(prefers-reduced-motion: reduce)").matches);
-    if (param === "0" || (seen && param !== "1")) setPhase("done");
+    if (param === "0" || playedThisPageLoad) setPhase("done");
     /* eslint-enable react-hooks/set-state-in-effect */
   }, []);
 
@@ -223,11 +223,8 @@ export default function BirthdayCountdown({ children }: { children: ReactNode })
   }, []);
 
   const lightsOn = useCallback(() => {
-    try {
-      sessionStorage.setItem(SEEN_KEY, "1");
-    } catch {
-      // Ignore: it will simply play again next visit.
-    }
+    // Marked here rather than on mount so React's double-run of effects in development can't skip it.
+    playedThisPageLoad = true;
     setRemaining(0);
     setPhase("lit");
   }, []);
