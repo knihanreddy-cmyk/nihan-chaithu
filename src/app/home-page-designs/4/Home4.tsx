@@ -283,7 +283,7 @@ export default function Home4({
               <span className={c("portal__glass", "glass")} aria-hidden="true" />
               <span className={c("chip", "chip--a", "glass")} data-depth="-1" aria-hidden="true">
                 <span className={styles.dot} />
-                Portfolio &middot; coming soon
+                Growing up in frames
               </span>
               <span className={c("chip", "chip--b", "glass")} data-depth=".7" aria-hidden="true">
                 <span className={styles.dot} />
@@ -291,21 +291,14 @@ export default function Home4({
               </span>
               <span className={styles.portal__body}>
                 <span className={styles.portal__frame} ref={frameNRef}>
-                  {/* Replace with <Image {...designImage("nihan")} … /> when Nihan's photos are ready */}
-                  <span
-                    className={c("portrait", "portrait--placeholder")}
-                    data-swap="nihan"
-                    role="img"
-                    aria-label="Nihan, portrait coming soon"
-                  >
-                    <span className={styles.ph__rings} aria-hidden="true" />
-                    <span className={styles.ph__n} aria-hidden="true">
-                      N
-                    </span>
-                    <span className={styles.ph__cap} aria-hidden="true">
-                      Portrait coming soon
-                    </span>
-                  </span>
+                  <Image
+                    src="/images/nihan/nihan-06.jpg"
+                    width={1063}
+                    height={1600}
+                    alt="Nihan in a navy embroidered kurta and sunglasses against a grey studio backdrop"
+                    sizes="(max-width: 760px) min(92vw, 432px), (max-width: 1040px) 42vw, 410px"
+                    preload
+                  />
                 </span>
                 <span className={styles.portal__meta}>
                   <span className={styles.eyebrow}>Portfolio</span>
