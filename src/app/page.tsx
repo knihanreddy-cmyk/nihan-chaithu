@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import BirthdayIntroGate from "@/components/BirthdayIntroGate";
 import Home4 from "./home-page-designs/4/Home4";
 import { home4Fonts } from "./home-page-designs/4/fonts";
 
@@ -9,5 +10,9 @@ export const metadata: Metadata = {
 };
 
 export default function Home() {
-  return <Home4 fontClassName={home4Fonts} preview={false} />;
+  return (
+    <BirthdayIntroGate>
+      <Home4 fontClassName={home4Fonts} preview={false} />
+    </BirthdayIntroGate>
+  );
 }
