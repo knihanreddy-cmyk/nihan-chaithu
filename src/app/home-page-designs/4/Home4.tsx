@@ -4,7 +4,9 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useLayoutEffect, useRef, useState, type FocusEvent as ReactFocusEvent, type PointerEvent as ReactPointerEvent } from "react";
-import { designImage, usePageBackground } from "@/components/designs/shared";
+import { usePageBackground } from "@/components/designs/shared";
+import { homeDefaults, type HomeContent } from "@/lib/cms/pages/home";
+import { imgProps, plain, rich } from "@/lib/cms/render";
 import styles from "./home.module.css";
 
 /** Join CSS-module class names, keeping the template's original names. */
@@ -49,8 +51,11 @@ function Arrow() {
 export default function Home4({
   fontClassName,
   preview = true,
+  content = homeDefaults,
 }: {
   fontClassName: string;
+  /** Editable copy and photos from the CMS. */
+  content?: HomeContent;
   /** Shows the "Home option 04 of 10" footer line used on /home-page-designs. */
   preview?: boolean;
 }) {
@@ -218,15 +223,13 @@ export default function Home4({
               C <i>&amp;</i> N
             </span>
           </Link>
-          <span className={c("pill", "glass")}>Family portfolio &middot; India</span>
+          <span className={c("pill", "glass")}>{content.header.pill}</span>
         </header>
 
         <main className={styles.main}>
           <div className={styles.lede}>
-            <p>Two portfolios, one family</p>
-            <h1>
-              Choose a <em>world</em>
-            </h1>
+            <p>{content.intro.kicker}</p>
+            <h1>{rich(content.intro.heading)}</h1>
           </div>
 
           <nav className={styles.portals} aria-label="Choose a portfolio">
@@ -243,30 +246,27 @@ export default function Home4({
               <span className={c("portal__glass", "glass")} aria-hidden="true" />
               <span className={c("chip", "chip--a", "glass")} data-depth="1" aria-hidden="true">
                 <span className={styles.dot} />
-                <b>IKFW</b> Season 11
+                {rich(content.chaithrika.chipA)}
               </span>
               <span className={c("chip", "chip--b", "glass")} data-depth="-.7" aria-hidden="true">
                 <span className={styles.dot} />
-                Amazon Kids
+                {content.chaithrika.chipB}
               </span>
               <span className={styles.portal__body}>
                 <span className={styles.portal__frame} ref={frameCRef}>
                   <Image
-                    {...designImage("blue-gown")}
-                    alt="Chaithrika in a teal ball gown against a pink studio backdrop"
+                    {...imgProps(content.chaithrika.image)} alt={content.chaithrika.image.alt}
                     sizes="(max-width: 760px) min(92vw, 432px), (max-width: 1040px) 42vw, 410px"
                     preload
                   />
                 </span>
                 <span className={styles.portal__meta}>
-                  <span className={styles.eyebrow}>Model &amp; actress</span>
-                  <span className={styles.name}>
-                    Chaith<em>rika</em>
-                  </span>
-                  <span className={styles.sub}>Runway &middot; Editorial &middot; Commercial &middot; Acting</span>
+                  <span className={styles.eyebrow}>{content.chaithrika.eyebrow}</span>
+                  <span className={styles.name}>{rich(content.chaithrika.name)}</span>
+                  <span className={styles.sub}>{content.chaithrika.sub}</span>
                   <Arrow />
                 </span>
-                <span className={styles.sr}>Enter Chaithrika&apos;s portfolio</span>
+                <span className={styles.sr}>Enter {plain(content.chaithrika.name)}&apos;s portfolio</span>
               </span>
             </Link>
 
@@ -283,41 +283,34 @@ export default function Home4({
               <span className={c("portal__glass", "glass")} aria-hidden="true" />
               <span className={c("chip", "chip--a", "glass")} data-depth="-1" aria-hidden="true">
                 <span className={styles.dot} />
-                Growing up in frames
+                {rich(content.nihan.chipA)}
               </span>
               <span className={c("chip", "chip--b", "glass")} data-depth=".7" aria-hidden="true">
                 <span className={styles.dot} />
-                New faces
+                {content.nihan.chipB}
               </span>
               <span className={styles.portal__body}>
                 <span className={styles.portal__frame} ref={frameNRef}>
                   <Image
-                    src="/images/nihan/nihan-25.jpg"
-                    width={1600}
-                    height={1200}
-                    alt="Nihan in a checked shirt and sunglasses, sitting on the rocks by the sea under a cloudy sky"
-                    // Landscape photo in a tall frame: keep him (left of centre) in view.
-                    style={{ objectPosition: "27% 40%" }}
+                    {...imgProps(content.nihan.image)} alt={content.nihan.image.alt}
                     sizes="(max-width: 760px) min(92vw, 432px), (max-width: 1040px) 42vw, 410px"
                     preload
                   />
                 </span>
                 <span className={styles.portal__meta}>
-                  <span className={styles.eyebrow}>Portfolio</span>
-                  <span className={styles.name}>
-                    Ni<em>han</em>
-                  </span>
-                  <span className={styles.sub}>New faces, fresh frames</span>
+                  <span className={styles.eyebrow}>{content.nihan.eyebrow}</span>
+                  <span className={styles.name}>{rich(content.nihan.name)}</span>
+                  <span className={styles.sub}>{content.nihan.sub}</span>
                   <Arrow />
                 </span>
-                <span className={styles.sr}>Enter Nihan&apos;s world</span>
+                <span className={styles.sr}>Enter {plain(content.nihan.name)}&apos;s world</span>
               </span>
             </Link>
           </nav>
         </main>
 
         <footer className={styles.foot}>
-          <span>Bookings managed by their parents</span>
+          <span>{content.footer.note}</span>
           {preview && (
             <span className={styles.foot__r}>
               <span className={styles.foot__opt}>Home option 04 of 10 &mdash; Glass Portals</span>

@@ -2,9 +2,11 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useRef, useState, useSyncExternalStore, type FormEvent, type MouseEvent, type Ref } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore, useTransition, type FormEvent, type MouseEvent, type Ref } from "react";
 import { usePageBackground } from "@/components/designs/shared";
-import { nihanPhoto, type NihanPhotoNo } from "./photos";
+import { submitEnquiry } from "@/app/actions/enquiry";
+import { nihanDefaults, type NihanCat, type NihanContent, type Tape } from "@/lib/cms/pages/nihan";
+import { imgProps, rich } from "@/lib/cms/render";
 import styles from "./nihan.module.css";
 
 /** Join CSS-module class names (template names kept), skipping falsy entries. */
@@ -45,73 +47,10 @@ const SECTIONS = [
 ] as const;
 type SectionId = (typeof SECTIONS)[number]["id"];
 
-const THANKS = "Thank you! Online enquiries aren't connected yet — please contact his parents directly.";
+/** Layout slots of the looks collage, in order. The first is the large framed photo. */
+const LOOK_SLOTS = ["lk-a", "lk-b", "lk-c", "lk-d", "lk-e"] as const;
 
-type Tape = "" | "g" | "b";
-
-const LOOKS: { cls: string; no: NihanPhotoNo; tape: Tape; alt: string; cap: string; small: string }[] = [
-  {
-    cls: "lk-b",
-    no: 28,
-    tape: "g",
-    alt: "Nihan in a striped navy and white sweater against a yellow wall",
-    cap: "Striped knit, 2026",
-    small: "Look 02",
-  },
-  {
-    cls: "lk-c",
-    no: 26,
-    tape: "b",
-    alt: "Festive close portrait of Nihan in a gold shawl and pearl necklaces with a tilak",
-    cap: "Festive look, 2023",
-    small: "Look 03",
-  },
-  {
-    cls: "lk-d",
-    no: 20,
-    tape: "",
-    alt: "Nihan in a lime-green kurta, white trousers and sunglasses in a garden",
-    cap: "Garden kurta, 2019",
-    small: "Look 04",
-  },
-  {
-    cls: "lk-e",
-    no: 15,
-    tape: "g",
-    alt: "Young Nihan dressed as little Krishna in a yellow dhoti and red scarf against a white wall",
-    cap: "Little Krishna, 2019",
-    small: "Look 05",
-  },
-];
-
-type Stop = {
-  no: NihanPhotoNo;
-  tape: Tape;
-  portrait: boolean;
-  alt: string;
-  cap: string;
-  date: string;
-  title: string;
-  text: string;
-  hand?: string;
-};
-
-const STOPS: Stop[] = [
-  { no: 19, tape: "", portrait: true, alt: "Baby Nihan looking at a phone, close-up", cap: "The first page", date: "Sep 2015", title: "Day one of the journal", text: "The earliest photo in the collection, already curious about the camera." },
-  { no: 1, tape: "g", portrait: false, alt: "Baby Nihan in a striped tee sitting beside a giant bottle gourd", cap: "Who's bigger?", date: "Jan 2016", title: "Vegetable for scale", text: "A striped tee and a bottle gourd almost as tall as him." },
-  { no: 3, tape: "b", portrait: false, alt: "Toddler Nihan at the steering wheel of a big red tractor", cap: "Driver's seat", date: "Sep 2017", title: "Big red tractor", text: "Hands on the wheel of the largest vehicle in the album.", hand: "first expedition vehicle" },
-  { no: 12, tape: "", portrait: true, alt: "Nihan standing next to a giant cartoon statue in a park", cap: "Park giants", date: "Jun 2018", title: "Park of statues", text: "A day out among giant figures, three pages from the same trip." },
-  { no: 13, tape: "g", portrait: false, alt: "Nihan riding a crocodile statue in a park", cap: "Crocodile ride", date: "Jun 2018", title: "Crocodile, tamed", text: "Same park, a braver seat.", hand: "no crocodiles were harmed" },
-  { no: 14, tape: "b", portrait: true, alt: "Nihan digging soil with a hoe", cap: "Ground work", date: "Jun 2018", title: "Digging in", text: "Hoe in hand, working the soil." },
-  { no: 16, tape: "", portrait: true, alt: "Nihan standing in a flooded paddy field holding rice saplings", cap: "Monsoon planting", date: "Jul 2020", title: "Paddy field, monsoon", text: "Ankle-deep in water with a bundle of rice saplings." },
-  { no: 21, tape: "g", portrait: true, alt: "Nihan in a yellow tee standing with his bicycle on a street", cap: "Two wheels", date: "Jul 2022", title: "On his own bicycle", text: "A yellow tee and a bike of his own for the street." },
-  { no: 5, tape: "b", portrait: true, alt: "Nihan walking on the beach in a striped tee and sunglasses with waves behind", cap: "Beach walk", date: "Undated page", title: "Along the waterline", text: "Striped tee, sunglasses and the waves for company." },
-  { no: 25, tape: "", portrait: false, alt: "Nihan by the sea in a checked shirt and sunglasses under a cloudy sky", cap: "Seaside, 2023", date: "Aug 2023", title: "Seaside, cinematic", text: "Checked shirt, dark glasses and a sky full of weather." },
-  { no: 27, tape: "g", portrait: false, alt: "Nihan smiling in a blue polo in front of an ornate temple", cap: "Temple visit", date: "Apr 2025", title: "Temple steps", text: "A big smile in front of carved stone.", hand: "latest stop, more to come" },
-];
-
-type Cat = "looks" | "adv" | "little";
-type Filter = "all" | Cat;
+type Filter = "all" | NihanCat;
 
 const FILTERS: { f: Filter; label: string }[] = [
   { f: "all", label: "All" },
@@ -120,26 +59,7 @@ const FILTERS: { f: Filter; label: string }[] = [
   { f: "little", label: "Little moments" },
 ];
 
-const TAG_LABEL: Record<Cat, string> = { looks: "Looks", adv: "Adventure", little: "Little" };
-
-const ENTRIES: { c: Cat; no: NihanPhotoNo; tape: Tape; alt: string; cap: string }[] = [
-  { c: "looks", no: 6, tape: "", alt: "Studio portrait in a navy embroidered kurta and sunglasses", cap: "Studio, navy kurta" },
-  { c: "adv", no: 3, tape: "b", alt: "Toddler driving a big red tractor", cap: "Tractor, 2017" },
-  { c: "little", no: 11, tape: "g", alt: "Baby studio shot on a black backdrop with a finger on his lip", cap: "Shh, studio baby" },
-  { c: "looks", no: 26, tape: "b", alt: "Festive portrait with gold shawl, pearl necklaces and tilak", cap: "Festive look, 2023" },
-  { c: "adv", no: 16, tape: "", alt: "Standing in a flooded paddy field with rice saplings", cap: "Paddy field, 2020" },
-  { c: "little", no: 2, tape: "", alt: "Toddler in sunglasses sitting on a car bonnet", cap: "Cool already, 2017" },
-  { c: "adv", no: 25, tape: "g", alt: "By the sea under a dramatic cloudy sky", cap: "Seaside, 2023" },
-  { c: "looks", no: 28, tape: "g", alt: "Striped navy and white sweater against a yellow wall", cap: "Yellow wall, 2026" },
-  { c: "little", no: 19, tape: "b", alt: "Baby looking at a phone, close-up", cap: "First photo, 2015" },
-  { c: "adv", no: 13, tape: "", alt: "Riding a crocodile statue in a park", cap: "Croc ride, 2018" },
-  { c: "looks", no: 22, tape: "b", alt: "At night among fairy lights in a yellow hoodie, holding a small light", cap: "Fairy lights, 2023" },
-  { c: "little", no: 24, tape: "g", alt: "Holding a green and white umbrella in a yellow tee", cap: "Umbrella day, 2023" },
-  { c: "adv", no: 21, tape: "b", alt: "With his bicycle on a street in a yellow tee", cap: "Cycling, 2022" },
-  { c: "looks", no: 20, tape: "", alt: "Lime-green kurta with white trousers and sunglasses in a garden", cap: "Garden kurta, 2019" },
-  { c: "little", no: 1, tape: "", alt: "Baby beside a giant bottle gourd", cap: "Bottle gourd, 2016" },
-  { c: "adv", no: 27, tape: "g", alt: "Smiling in a blue polo in front of an ornate temple", cap: "Temple, 2025" },
-];
+const TAG_LABEL: Record<NihanCat, string> = { looks: "Looks", adv: "Adventure", little: "Little" };
 
 const tapeClass = (tape: Tape, ...extra: string[]) => c("tape", tape || null, ...extra);
 
@@ -168,7 +88,17 @@ function Compass({ needleRef }: { needleRef: Ref<SVGGElement> }) {
   );
 }
 
-export default function NihanJournal({ fontClassName }: { fontClassName: string }) {
+export default function NihanJournal({
+  fontClassName,
+  content = nihanDefaults,
+}: {
+  fontClassName: string;
+  /** Editable copy and photos from the CMS. */
+  content?: NihanContent;
+}) {
+  const { hero, intro, looks, story, gallery, sibling, contact, footer } = content;
+  const ENTRIES = gallery.entries;
+  const [sending, startSending] = useTransition();
   usePageBackground("#EFE6D2");
 
   const rootRef = useRef<HTMLDivElement>(null);
@@ -450,11 +380,16 @@ export default function NihanJournal({ fontClassName }: { fontClassName: string 
 
   const onSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setThanks(THANKS);
-    e.currentTarget.reset();
+    const form = e.currentTarget;
+    const data = new FormData(form);
+    startSending(async () => {
+      const res = await submitEnquiry("nihan", data);
+      setThanks(res.message);
+      if (res.ok) form.reset();
+    });
   };
 
-  const shown = ENTRIES.filter((en) => filter === "all" || en.c === filter).length;
+  const shown = ENTRIES.filter((en) => filter === "all" || en.category === filter).length;
 
   const rootClass = [styles.root, ready ? styles.ready : "", fontClassName].filter(Boolean).join(" ");
 
@@ -560,11 +495,9 @@ export default function NihanJournal({ fontClassName }: { fontClassName: string 
         <section className={styles.hero} aria-labelledby="hero-title">
           <div className={styles.wrap}>
             <div>
-              <span className={c("cover-label", "kicker")}>Portfolio &middot; Vol. 1</span>
-              <h1 id="hero-title">
-                The Adventures <em>of Nihan</em>
-              </h1>
-              <p className={styles.lead}>New faces, fresh frames. Style, story and a lot of sunshine.</p>
+              <span className={c("cover-label", "kicker")}>{hero.kicker}</span>
+              <h1 id="hero-title">{rich(hero.title)}</h1>
+              <p className={styles.lead}>{hero.lead}</p>
               <div className={styles.btns}>
                 <a className={styles.btn} href="#looks">
                   Open the journal &rarr;
@@ -575,24 +508,27 @@ export default function NihanJournal({ fontClassName }: { fontClassName: string 
               </div>
             </div>
             <div className={styles["hero-photo"]}>
-              <span className={styles["hero-note"]} aria-hidden="true">
-                best view yet!
-              </span>
+              {hero.note && (
+                <span className={styles["hero-note"]} aria-hidden="true">
+                  {hero.note}
+                </span>
+              )}
               <figure className={styles.tp}>
                 <span className={tapeClass("", "c1")} />
                 <span className={tapeClass("b", "c2")} />
                 <Image
-                  {...nihanPhoto(25)}
-                  alt="Nihan by the sea in a checked shirt and sunglasses under a cloudy, dramatic sky"
+                  {...imgProps(hero.image)} alt={hero.image.alt}
                   sizes="(max-width: 860px) calc(100vw - 40px), (max-width: 1220px) 52vw, 610px"
                   preload
                 />
                 <figcaption>
-                  Seaside, Aug 2023<small>Field page 01</small>
+                  {hero.caption}
+                  {hero.captionSmall && <small>{hero.captionSmall}</small>}
                 </figcaption>
               </figure>
               <div className={styles.stamp} aria-hidden="true">
-                Field notes<span>Nihan Reddy</span>2015&ndash;2026
+                Field notes<span>Nihan Reddy</span>
+                {hero.stampYears}
               </div>
             </div>
           </div>
@@ -601,11 +537,8 @@ export default function NihanJournal({ fontClassName }: { fontClassName: string 
         {/* INTRO */}
         <section className={styles.intro} aria-label="Introduction">
           <div className={c("wrap", "rv")}>
-            <span className={styles.hand}>First entry &mdash;</span>
-            <p>
-              From a curious baby in 2015 to a sharp-dressed boy in 2026: tractors, paddy fields, seasides and temple
-              steps. These pages keep his looks, his places and the little moments in between.
-            </p>
+            <span className={styles.hand}>{intro.hand}</span>
+            <p>{intro.text}</p>
           </div>
         </section>
 
@@ -615,51 +548,53 @@ export default function NihanJournal({ fontClassName }: { fontClassName: string 
             <div className={c("sec-head", "rv")}>
               <div>
                 <span className={styles.pageno}>p. 02</span>
-                <h2 id="looks-title">Packing list: Looks</h2>
+                <h2 id="looks-title">{looks.heading}</h2>
               </div>
-              <p>Five outfits worth taking on any trip, from studio kurta to festive gold.</p>
+              <p>{looks.intro}</p>
             </div>
             <div className={styles["looks-layout"]}>
               <aside className={c("pack", "rv")} aria-label="Outfit checklist">
-                <h3>Outfits packed</h3>
+                <h3>{looks.packTitle}</h3>
                 <ul>
-                  <li>Navy embroidered kurta</li>
-                  <li>Lime-green kurta, 2019</li>
-                  <li>Festive gold shawl, 2023</li>
-                  <li>Striped sweater, 2026</li>
-                  <li>Little-Krishna costume</li>
+                  {looks.packList.map((item, i) => (
+                    <li key={i}>{item}</li>
+                  ))}
                 </ul>
-                <p className={styles.foot}>Sunglasses come along every time.</p>
+                {looks.packFoot && <p className={styles.foot}>{looks.packFoot}</p>}
               </aside>
               <div className={styles["looks-grid"]}>
-                <figure className={c("tp", "lk-a", "rv")}>
-                  <span className={styles.tape} />
-                  <div className={styles.imgbox}>
-                    <Image
-                      src={nihanPhoto(6).src}
-                      fill
-                      alt="Studio portrait of Nihan in a navy embroidered kurta and sunglasses against a grey backdrop"
-                      sizes="(max-width: 640px) calc(100vw - 60px), (max-width: 980px) 38vw, 320px"
-                    />
-                  </div>
-                  <figcaption>
-                    Navy kurta, studio<small>Look 01</small>
-                  </figcaption>
-                </figure>
-                {LOOKS.map((lk) => (
-                  <figure key={lk.cls} className={c("tp", lk.cls, "rv")}>
-                    <span className={tapeClass(lk.tape)} />
-                    <Image
-                      {...nihanPhoto(lk.no)}
-                      alt={lk.alt}
-                      sizes="(max-width: 640px) 44vw, (max-width: 980px) 29vw, 250px"
-                    />
-                    <figcaption>
-                      {lk.cap}
-                      <small>{lk.small}</small>
-                    </figcaption>
-                  </figure>
-                ))}
+                {looks.items.slice(0, LOOK_SLOTS.length).map((lk, i) =>
+                  i === 0 ? (
+                    <figure key={i} className={c("tp", LOOK_SLOTS[i], "rv")}>
+                      <span className={tapeClass(lk.tape)} />
+                      <div className={styles.imgbox}>
+                        <Image
+                          src={lk.image.src}
+                          fill
+                          alt={lk.image.alt}
+                          style={lk.image.position ? { objectPosition: lk.image.position } : undefined}
+                          sizes="(max-width: 640px) calc(100vw - 60px), (max-width: 980px) 38vw, 320px"
+                        />
+                      </div>
+                      <figcaption>
+                        {lk.caption}
+                        {lk.small && <small>{lk.small}</small>}
+                      </figcaption>
+                    </figure>
+                  ) : (
+                    <figure key={i} className={c("tp", LOOK_SLOTS[i], "rv")}>
+                      <span className={tapeClass(lk.tape)} />
+                      <Image
+                        {...imgProps(lk.image)} alt={lk.image.alt}
+                        sizes="(max-width: 640px) 44vw, (max-width: 980px) 29vw, 250px"
+                      />
+                      <figcaption>
+                        {lk.caption}
+                        {lk.small && <small>{lk.small}</small>}
+                      </figcaption>
+                    </figure>
+                  ),
+                )}
               </div>
             </div>
           </div>
@@ -671,9 +606,9 @@ export default function NihanJournal({ fontClassName }: { fontClassName: string 
             <div className={c("sec-head", "rv")}>
               <div>
                 <span className={styles.pageno}>p. 03</span>
-                <h2 id="story-title">The route so far</h2>
+                <h2 id="story-title">{story.heading}</h2>
               </div>
-              <p>Growing up in frames: every stop on the map, in the order it happened.</p>
+              <p>{story.intro}</p>
             </div>
             <p className={styles["route-start"]} aria-hidden="true">
               Start here &darr;
@@ -696,20 +631,21 @@ export default function NihanJournal({ fontClassName }: { fontClassName: string 
                 />
               </svg>
 
-              {STOPS.map((s, i) => (
-                <article key={s.no} className={c("stop", i % 2 === 1 && "flip", "rv")}>
-                  <figure className={c("tp", s.portrait && "p")}>
+              {story.stops.map((s, i) => {
+                const portrait = s.image.height > s.image.width;
+                return (
+                <article key={i} className={c("stop", i % 2 === 1 && "flip", "rv")}>
+                  <figure className={c("tp", portrait && "p")}>
                     <span className={tapeClass(s.tape)} />
                     <Image
-                      {...nihanPhoto(s.no)}
-                      alt={s.alt}
+                      {...imgProps(s.image)} alt={s.image.alt}
                       sizes={
-                        s.portrait
+                        portrait
                           ? "(max-width: 720px) 62vw, 330px"
                           : "(max-width: 720px) 80vw, (max-width: 1220px) 45vw, 550px"
                       }
                     />
-                    <figcaption>{s.cap}</figcaption>
+                    <figcaption>{s.caption}</figcaption>
                   </figure>
                   <div className={styles.note}>
                     <span className={styles.date}>{s.date}</span>
@@ -718,9 +654,10 @@ export default function NihanJournal({ fontClassName }: { fontClassName: string 
                     {s.hand && <span className={styles.hand}>{s.hand}</span>}
                   </div>
                 </article>
-              ))}
+                );
+              })}
             </div>
-            <p className={styles["route-end"]}>&hellip; to be continued</p>
+            <p className={styles["route-end"]}>{story.end}</p>
           </div>
         </section>
 
@@ -730,9 +667,9 @@ export default function NihanJournal({ fontClassName }: { fontClassName: string 
             <div className={c("sec-head", "rv")}>
               <div>
                 <span className={styles.pageno}>p. 04</span>
-                <h2 id="gallery-title">Logged entries</h2>
+                <h2 id="gallery-title">{gallery.heading}</h2>
               </div>
-              <p>Every page, stamped and sorted. Pick a stamp to filter.</p>
+              <p>{gallery.intro}</p>
             </div>
             <div className={styles.chips} role="group" aria-label="Filter gallery">
               {FILTERS.map((ch) => (
@@ -752,19 +689,18 @@ export default function NihanJournal({ fontClassName }: { fontClassName: string 
             </p>
             <div className={styles.entries}>
               {ENTRIES.map((en, i) => (
-                <div key={i} className={styles.entry} hidden={!(filter === "all" || en.c === filter)}>
+                <div key={i} className={styles.entry} hidden={!(filter === "all" || en.category === filter)}>
                   <figure className={styles.tp}>
                     <span className={tapeClass(en.tape)} />
                     <Image
-                      {...nihanPhoto(en.no)}
-                      alt={en.alt}
+                      {...imgProps(en.image)} alt={en.image.alt}
                       sizes="(max-width: 900px) 46vw, (max-width: 1220px) 30vw, 375px"
                     />
-                    <figcaption>{en.cap}</figcaption>
+                    <figcaption>{en.caption}</figcaption>
                   </figure>
                   <div className={styles.meta}>
                     <span className={styles.no}>No. {String(i + 1).padStart(2, "0")}</span>
-                    <span className={c("tag", `tag-${en.c}`)}>{TAG_LABEL[en.c]}</span>
+                    <span className={c("tag", `tag-${en.category}`)}>{TAG_LABEL[en.category]}</span>
                   </div>
                 </div>
               ))}
@@ -778,23 +714,19 @@ export default function NihanJournal({ fontClassName }: { fontClassName: string 
             <figure className={c("tp", "rv")}>
               <span className={tapeClass("", "c1")} />
               <span className={tapeClass("g", "c2")} />
-              <Image
-                {...nihanPhoto(23)}
-                alt="Nihan with his sister Chaithrika, both carrying school-style bags"
-                sizes="(max-width: 800px) 90vw, 420px"
-              />
-              <figcaption>With Chaithrika, Jun 2023</figcaption>
+              <Image {...imgProps(sibling.image)} alt={sibling.image.alt} sizes="(max-width: 800px) 90vw, 420px" />
+              <figcaption>{sibling.caption}</figcaption>
             </figure>
             <div className={styles.rv}>
-              <span className={styles.kicker}>Expedition partner</span>
+              <span className={styles.kicker}>{sibling.kicker}</span>
               <h2 id="sib-title" style={{ marginTop: 12 }}>
-                Every explorer needs a co-pilot.
+                {sibling.heading}
               </h2>
-              <span className={styles["hand-big"]}>bags packed, ready to go</span>
-              <p>His sister Chaithrika is a child model and actress, and the other half of this family portfolio.</p>
+              {sibling.hand && <span className={styles["hand-big"]}>{sibling.hand}</span>}
+              <p>{sibling.text}</p>
               <div className={styles.btns} style={{ marginTop: 24 }}>
                 <Link className={styles.btn} href="/chaithrika">
-                  Meet his sister Chaithrika &rarr;
+                  {sibling.button}
                 </Link>
               </div>
             </div>
@@ -806,12 +738,9 @@ export default function NihanJournal({ fontClassName }: { fontClassName: string 
           <div className={styles.wrap}>
             <div className={c("side", "rv")}>
               <span className={styles.pageno}>p. 05</span>
-              <h2 id="contact-title">Send a note</h2>
-              <p style={{ marginTop: 16 }}>
-                For shoots, campaigns and collaborations. Bookings are managed by his parents, who will reply
-                personally.
-              </p>
-              <span className={styles.hand}>&mdash; replies come by post (well, email)</span>
+              <h2 id="contact-title">{contact.heading}</h2>
+              <p style={{ marginTop: 16 }}>{contact.text}</p>
+              {contact.hand && <span className={styles.hand}>{contact.hand}</span>}
             </div>
             <div className={c("letter", "rv")}>
               <span className={tapeClass("b")} />
@@ -828,8 +757,16 @@ export default function NihanJournal({ fontClassName }: { fontClassName: string 
                   <label htmlFor="f-msg">Message</label>
                   <textarea id="f-msg" name="message" rows={4} />
                 </div>
-                <button className={styles.btn} type="submit">
-                  Post the note &rarr;
+                <input
+                  name="website"
+                  type="text"
+                  tabIndex={-1}
+                  autoComplete="off"
+                  aria-hidden="true"
+                  style={{ position: "absolute", left: "-10000px", width: 1, height: 1, opacity: 0 }}
+                />
+                <button className={styles.btn} type="submit" disabled={sending}>
+                  {sending ? "Posting…" : "Post the note →"}
                 </button>
                 <p className={styles.thanks} role="status">
                   {thanks}
@@ -853,7 +790,7 @@ export default function NihanJournal({ fontClassName }: { fontClassName: string 
             <a href="#gallery">Gallery</a>
             <a href="#contact">Contact</a>
           </nav>
-          <span>Bookings managed by his parents &middot; &copy; Nihan Reddy</span>
+          <span>{footer.copyright}</span>
         </div>
       </footer>
     </div>

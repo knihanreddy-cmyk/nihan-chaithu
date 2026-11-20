@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Caveat, Karla, Zilla_Slab } from "next/font/google";
 import NihanJournal from "./NihanJournal";
+import { getContent } from "@/lib/cms/content";
 
 const zillaSlab = Zilla_Slab({
   subsets: ["latin"],
@@ -28,6 +29,12 @@ export const metadata: Metadata = {
     "Field notes from growing up: Nihan Reddy's looks, adventures and little moments, 2015–2026. Bookings are managed by his parents.",
 };
 
-export default function NihanPage() {
-  return <NihanJournal fontClassName={[zillaSlab.variable, karla.variable, caveat.variable].join(" ")} />;
+export default async function NihanPage() {
+  const content = await getContent("nihan");
+  return (
+    <NihanJournal
+      fontClassName={[zillaSlab.variable, karla.variable, caveat.variable].join(" ")}
+      content={content}
+    />
+  );
 }

@@ -1,9 +1,12 @@
 "use client";
 
-import { useEffect, useRef, useState, useSyncExternalStore, type CSSProperties, type FormEvent } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore, useTransition, type CSSProperties, type FormEvent, type ReactNode } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { designImage, usePageBackground, type DesignImageName } from "@/components/designs/shared";
+import { usePageBackground } from "@/components/designs/shared";
+import { submitEnquiry } from "@/app/actions/enquiry";
+import { chaithrikaDefaults, type ChaithrikaContent } from "@/lib/cms/pages/chaithrika";
+import { imgProps, rich as richText } from "@/lib/cms/render";
 import styles from "./design.module.css";
 
 /** Map a space-separated list of template class names onto the CSS Module. */
@@ -59,6 +62,14 @@ const CHAPTER_BG: Record<Chapter, string> = {
 const isChapter = (v: string | undefined): v is Chapter => !!v && v in CHAPTER_BG;
 
 const THANKS = "Thank you — this is a design preview, so nothing was sent.";
+
+/** *accent* words use the italic serif style of this design. */
+const rich = (text: string) =>
+  richText(text, (children: ReactNode, key: number) => (
+    <span key={key} className={cx("it")}>
+      {children}
+    </span>
+  ));
 const NAME = "CHAITHRIKA".split("");
 
 const NAV = [
@@ -68,68 +79,6 @@ const NAV = [
   ["#about", "About"],
   ["#contact", "Contact"],
 ] as const;
-
-type Card = { img: DesignImageName; tall?: boolean; alt: string; title: string; where: string };
-const CARDS: Card[] = [
-  {
-    img: "white-chair",
-    alt: "Chaithrika in a white tulle dress seated on a white folding chair, with soft pink hearts on the backdrop",
-    title: "White tulle",
-    where: "Studio",
-  },
-  {
-    img: "fairy",
-    tall: true,
-    alt: "Chaithrika in a white tulle dress with fairy wings against a grey studio backdrop",
-    title: "Fairy wings",
-    where: "Studio",
-  },
-  {
-    img: "green-gown",
-    alt: "Chaithrika holding out a dark green gown, wearing a tiara, with palm leaves behind her",
-    title: "Emerald gown",
-    where: "Outdoors",
-  },
-  {
-    img: "navy-ethnic",
-    tall: true,
-    alt: "Chaithrika in a navy embroidered dress with jewelled hair clips, looking down at hibiscus buds",
-    title: "Navy & hibiscus",
-    where: "Outdoors",
-  },
-  {
-    img: "red-peplum",
-    alt: "Chaithrika smiling in a red brocade peplum top and pink skirt against a pink backdrop",
-    title: "Red brocade",
-    where: "Studio",
-  },
-  {
-    img: "garden",
-    tall: true,
-    alt: "Chaithrika in a black and gold half-saree in a flowering garden, smiling shyly",
-    title: "Black & gold",
-    where: "Garden",
-  },
-  {
-    img: "yellow-jeep",
-    alt: "Chaithrika in a yellow butterfly sweatshirt stepping out of a jeep, colour against a black and white background",
-    title: "Butterfly yellow",
-    where: "Street",
-  },
-  {
-    img: "park",
-    tall: true,
-    alt: "Chaithrika in a yellow tee with an owl backpack on a red park bench, from a low angle",
-    title: "Park day",
-    where: "Lifestyle",
-  },
-  {
-    img: "backstage",
-    alt: "Backstage at IKFW, Chaithrika with an event lanyard looking into a bulb-lit makeup mirror",
-    title: "Before the lights",
-    where: "Backstage, IKFW",
-  },
-];
 
 function Arrow() {
   return (
@@ -236,8 +185,11 @@ function Cursor() {
 export default function Design10({
   fontClassName,
   preview = true,
+  content = chaithrikaDefaults,
 }: {
   fontClassName: string;
+  /** Editable copy and photos from the CMS. */
+  content?: ChaithrikaContent;
   /** Preview mode (/design-10) shows the design-option footer line; the live /chaithrika page links home instead. */
   preview?: boolean;
 }) {
@@ -249,6 +201,8 @@ export default function Design10({
 
   const [menuOpen, setMenuOpen] = useState(false);
   const [thanks, setThanks] = useState("");
+  const [sending, startSending] = useTransition();
+  const { hero, about, categories, scenes, gallery, quote, contact, footer } = content;
 
   const rootRef = useRef<HTMLDivElement>(null);
   const burgerRef = useRef<HTMLButtonElement>(null);
@@ -447,7 +401,17 @@ export default function Design10({
 
   const onSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setThanks(THANKS);
+    if (preview) {
+      setThanks(THANKS);
+      return;
+    }
+    const form = e.currentTarget;
+    const data = new FormData(form);
+    startSending(async () => {
+      const res = await submitEnquiry("chaithrika", data);
+      setThanks(res.message);
+      if (res.ok) form.reset();
+    });
   };
   const closeMenu = () => setMenuOpen(false);
 
@@ -527,7 +491,7 @@ export default function Design10({
               <span className={cx("dot")} />
               Chapter 01 — Rose
             </p>
-            <p className={cx("kick")}>Child model &amp; actress · India</p>
+            <p className={cx("kick")}>{hero.kickerRight}</p>
           </div>
           <div className={cx("stage")} ref={stageRef}>
             <h1 className={cx("name name-back")}>
@@ -537,9 +501,8 @@ export default function Design10({
               </span>
             </h1>
             <Image
-              {...designImage("runway-cutout")}
+              {...imgProps(hero.image)} alt={hero.image.alt}
               className={cx("cut")}
-              alt="Chaithrika in a kalamkari crop top and mint striped lehenga, her runway look from India Kids Fashion Week Season 11"
               sizes="(max-width: 700px) 76vw, 520px"
               preload
             />
@@ -551,13 +514,10 @@ export default function Design10({
           </div>
           <div className={cx("wrap")}>
             <div className={cx("hero-foot")}>
-              <p className={cx("lede")}>Every look is a&nbsp;scene.</p>
-              <p className={cx("sub")}>
-                Runway, editorial, commercial and acting. From the India Kids Fashion Week Season 11 runway to Amazon
-                Kids Dress, a presence that carries the whole frame.
-              </p>
+              <p className={cx("lede")}>{hero.lede}</p>
+              <p className={cx("sub")}>{hero.sub}</p>
               <a className={cx("cta")} href="#contact" data-magnetic="">
-                <span className={cx("ci")}>Book Chaithrika</span>
+                <span className={cx("ci")}>{hero.cta}</span>
                 <Arrow />
               </a>
             </div>
@@ -572,38 +532,23 @@ export default function Design10({
               About
             </p>
             <h2 id="about-h" className={cx("statement rv")}>
-              Confidence, creativity and <span className={cx("it")}>expressive performance</span>, brought to every
-              single brief.
+              {rich(about.statement)}
             </h2>
             <figure className={cx("about-fig mask rv")} data-cursor="img">
               <Image
-                {...designImage("floral-lehenga")}
-                alt="Chaithrika mid-twirl in a maroon embellished top and cream floral skirt against a pink studio backdrop"
+                {...imgProps(about.image)} alt={about.image.alt}
                 sizes="(max-width: 900px) 80vw, (max-width: 1600px) 40vw, 640px"
               />
             </figure>
             <div className={cx("about-copy rv")}>
-              <p>
-                From India Kids Fashion Week Season 11 to Amazon Kids Dress, Chaithrika brings confidence, creativity,
-                and expressive performance to every brief. Her work blends clean camera presence with a natural sense
-                of movement and story.
-              </p>
-              <p>
-                A twirl in the studio, a turn at the end of a runway, a glance held a beat longer for the camera: each
-                is treated as a scene with a beginning, a feeling and a finish.
-              </p>
+              {about.paragraphs.map((p, i) => (
+                <p key={i}>{p}</p>
+              ))}
               <ul className={cx("discs")} aria-label="Disciplines">
-                {(
-                  [
-                    ["Runway", "Movement"],
-                    ["Editorial", "Stillness"],
-                    ["Commercial", "Warmth"],
-                    ["Acting", "Story"],
-                  ] as const
-                ).map(([d, s]) => (
-                  <li key={d}>
-                    <span className={cx("it")}>{d}</span>
-                    <small>{s}</small>
+                {about.disciplines.map((d, i) => (
+                  <li key={i}>
+                    <span className={cx("it")}>{d.name}</span>
+                    <small>{d.note}</small>
                   </li>
                 ))}
               </ul>
@@ -617,8 +562,8 @@ export default function Design10({
             <div className={cx("mq-track")}>
               {[false, true].map((dup) => (
                 <div key={String(dup)} className={cx("mq-group")} aria-hidden={dup || undefined}>
-                  {["Runway", "Editorial", "Commercial", "Acting", "Screen", "Stage", "Performance"].map((w) => (
-                    <MarqueeItem key={w} word={w} />
+                  {categories.marquee.map((w, i) => (
+                    <MarqueeItem key={i} word={w} />
                   ))}
                 </div>
               ))}
@@ -632,47 +577,37 @@ export default function Design10({
                   Chapter 02 — Marigold
                 </p>
                 <h2 id="cats-h" className={cx("disp")}>
-                  Two stages
+                  {rich(categories.heading)}
                 </h2>
               </div>
-              <p className={cx("rv")}>
-                One asks her to carry a look. The other asks her to carry a character. Both, in her words, ask for
-                presence.
-              </p>
+              <p className={cx("rv")}>{categories.intro}</p>
             </div>
             <div className={cx("cat-grid")}>
               <article className={cx("cat")} id="modeling" aria-labelledby="mod-h">
                 <figure className={cx("mask rv")} data-cursor="img">
                   <Image
-                    {...designImage("orange-flowers")}
-                    alt="Chaithrika standing with hands on hips in an orange dress with three-dimensional flowers, against a grey studio backdrop"
+                    {...imgProps(categories.modeling.image)} alt={categories.modeling.image.alt}
                     sizes="(max-width: 720px) calc(100vw - 32px), (max-width: 1600px) 45vw, 720px"
                   />
                 </figure>
                 <h3 id="mod-h" className={cx("disp")}>
-                  Modeling
+                  {categories.modeling.title}
                 </h3>
-                <p className={cx("kinds")}>Runway · Editorial · Fashion campaigns</p>
-                <p className={cx("body")}>
-                  Poise on the runway, stillness for the editorial frame, and the easy warmth a campaign needs to make
-                  clothes feel alive.
-                </p>
+                <p className={cx("kinds")}>{categories.modeling.kinds}</p>
+                <p className={cx("body")}>{categories.modeling.body}</p>
               </article>
               <article className={cx("cat")} id="acting" aria-labelledby="act-h">
                 <figure className={cx("mask rv")} data-cursor="img">
                   <Image
-                    {...designImage("saree")}
-                    alt="Chaithrika in an orange and green traditional outfit with jewellery, leaning on a tree and looking up"
+                    {...imgProps(categories.acting.image)} alt={categories.acting.image.alt}
                     sizes="(max-width: 720px) calc(100vw - 32px), (max-width: 1600px) 45vw, 720px"
                   />
                 </figure>
                 <h3 id="act-h" className={cx("disp")}>
-                  Acting
+                  {categories.acting.title}
                 </h3>
-                <p className={cx("kinds")}>Screen · Stage · Performance</p>
-                <p className={cx("body")}>
-                  A face that holds a thought before it speaks. Find the feeling first, and the performance follows.
-                </p>
+                <p className={cx("kinds")}>{categories.acting.kinds}</p>
+                <p className={cx("body")}>{categories.acting.body}</p>
               </article>
             </div>
           </div>
@@ -686,37 +621,29 @@ export default function Design10({
               Chapter 03 — Mint
             </p>
             <h2 id="work-h" className={cx("disp rv")}>
-              Featured <span className={cx("it")}>scenes</span>
+              {rich(scenes.heading)}
             </h2>
           </div>
 
           <article className={cx("scene-a")} aria-labelledby="s1-h">
             <div className={cx("frame")} data-cursor="img" ref={s1FrameRef}>
-              <Image
-                {...designImage("runway")}
-                alt="Chaithrika walking the India Kids Fashion Week Season 11 runway in a kalamkari crop top and mint striped lehenga, under stage lights with the audience watching"
-                sizes="100vw"
-              />
+              <Image {...imgProps(scenes.scene1.image)} alt={scenes.scene1.image.alt} sizes="100vw" />
             </div>
             <div className={cx("scene-cap")}>
               <span className={cx("idx")} aria-hidden="true">
                 01
               </span>
               <div>
-                <h3 id="s1-h">
-                  India Kids Fashion Week <span className={cx("it")}>Season 11</span>
-                </h3>
-                <p>
-                  A poised walk at IKFW Season 11 with expressive stage presence, graceful movement, and a memorable
-                  runway finish.
-                </p>
+                <h3 id="s1-h">{rich(scenes.scene1.title)}</h3>
+                <p>{scenes.scene1.text}</p>
               </div>
               <p className={cx("meta")}>
-                Runway show
-                <br />
-                Dec 18, 2024
-                <br />
-                Kalamkari &amp; mint
+                {scenes.scene1.meta.map((line, i) => (
+                  <span key={i}>
+                    {i > 0 && <br />}
+                    {line}
+                  </span>
+                ))}
               </p>
             </div>
           </article>
@@ -728,25 +655,23 @@ export default function Design10({
                   02
                 </span>
                 <h3 id="s2-h" className={cx("disp")}>
-                  Pinnacle Business Park <span className={cx("it")}>Brand photoshoot, 2024</span>
+                  {rich(scenes.scene2.title)}
                 </h3>
-                <p>
-                  A brand campaign shot at one of Bangalore&rsquo;s premier business destinations, balancing couture,
-                  confidence, and polished camera presence.
-                </p>
+                <p>{scenes.scene2.text}</p>
               </div>
               <figure className={cx("mask rv")} data-cursor="img">
                 <Image
-                  {...designImage("teal-lehenga")}
-                  alt="Chaithrika in a green blouse, orange silk lehenga and teal and yellow dupatta, looking off to one side"
+                  {...imgProps(scenes.scene2.image)} alt={scenes.scene2.image.alt}
                   sizes="(max-width: 900px) 80vw, (max-width: 1600px) 40vw, 640px"
                 />
-                <figcaption>Studio portrait — orange silk lehenga, teal dupatta</figcaption>
+                {scenes.scene2.caption && <figcaption>{scenes.scene2.caption}</figcaption>}
               </figure>
-              <div className={cx("credit-line rv")}>
-                <p className={cx("kick")}>Also in the credits</p>
-                <p className={cx("it")}>Amazon Kids Dress — commercial</p>
-              </div>
+              {(scenes.scene2.creditKicker || scenes.scene2.credit) && (
+                <div className={cx("credit-line rv")}>
+                  <p className={cx("kick")}>{scenes.scene2.creditKicker}</p>
+                  <p className={cx("it")}>{scenes.scene2.credit}</p>
+                </div>
+              )}
             </article>
           </div>
         </section>
@@ -761,7 +686,7 @@ export default function Design10({
                   Chapter 04 — Night
                 </p>
                 <h2 id="gal-h" className={cx("disp")}>
-                  The <span className={cx("it")}>wardrobe</span>
+                  {rich(gallery.heading)}
                 </h2>
               </div>
               <div className={cx("hs-hint")}>
@@ -783,18 +708,15 @@ export default function Design10({
             >
               <ul className={cx("hs-track")} id="hstrack" ref={trackRef}>
                 <li className={cx("card intro")}>
-                  <p className={cx("big")}>Nine looks. One presence.</p>
-                  <p className={cx("small")}>
-                    Tulle and silk, sweatshirts and sequins: studio, garden, street and backstage.
-                  </p>
+                  <p className={cx("big")}>{gallery.introBig}</p>
+                  <p className={cx("small")}>{gallery.introSmall}</p>
                 </li>
-                {CARDS.map((card) => (
-                  <li key={card.img} className={cx(card.tall ? "card tall" : "card")}>
+                {gallery.cards.map((card, i) => (
+                  <li key={i} className={cx(card.tall ? "card tall" : "card")}>
                     <figure>
                       <div className={cx("ph")} data-cursor="img">
                         <Image
-                          {...designImage(card.img)}
-                          alt={card.alt}
+                          {...imgProps(card.image)} alt={card.image.alt}
                           sizes="(max-width: 472px) 72vw, (max-width: 899px) 340px, 460px"
                         />
                       </div>
@@ -814,11 +736,7 @@ export default function Design10({
         <section className={cx("quote ch ch-rose")} data-ch="rose" aria-label="In her words">
           <div className={cx("wrap q-grid")}>
             <figure className={cx("q-fig mask rv")} data-cursor="img">
-              <Image
-                {...designImage("blue-gown")}
-                alt="Chaithrika in a teal-blue rose ball gown with a hand on her hip, beside a wooden stool against a pink backdrop"
-                sizes="(max-width: 900px) 75vw, (max-width: 1600px) 40vw, 640px"
-              />
+              <Image {...imgProps(quote.image)} alt={quote.image.alt} sizes="(max-width: 900px) 75vw, (max-width: 1600px) 40vw, 640px" />
             </figure>
             <div className={cx("q-body rv")}>
               <p className={cx("kick")}>
@@ -826,8 +744,8 @@ export default function Design10({
                 In her words
               </p>
               <blockquote>
-                <p>Modeling and acting both ask for presence. I love the challenge each one brings.</p>
-                <footer>Chaithrika</footer>
+                <p>{quote.text}</p>
+                <footer>{quote.author}</footer>
               </blockquote>
             </div>
           </div>
@@ -841,16 +759,14 @@ export default function Design10({
               Final chapter — Bookings
             </p>
             <h2 id="contact-h" className={cx("disp rv")}>
-              Let&rsquo;s create something <span className={cx("it")}>beautiful</span> together.
+              {rich(contact.heading)}
             </h2>
             <div className={cx("c-grid")}>
               <div className={cx("c-copy rv")}>
-                <p>
-                  Casting a runway show, an editorial, a campaign or a role? Chaithrika&rsquo;s parents handle every
-                  booking personally.
-                </p>
-                <p>Share the brief, the dates and the feeling you are after.</p>
-                <p className={cx("avail")}>Available for bookings</p>
+                {contact.paragraphs.map((p, i) => (
+                  <p key={i}>{p}</p>
+                ))}
+                {contact.availability && <p className={cx("avail")}>{contact.availability}</p>}
               </div>
               <form className={cx("form rv")} id="enquiry" noValidate onSubmit={onSubmit}>
                 <div className={cx("field")}>
@@ -858,28 +774,37 @@ export default function Design10({
                   <input id="f-name" name="name" type="text" autoComplete="name" />
                 </div>
                 <div className={cx("field")}>
+                  <label htmlFor="f-contact">Email or phone</label>
+                  <input id="f-contact" name="contact" type="text" autoComplete="email" />
+                </div>
+                <div className={cx("field")}>
                   <label htmlFor="f-brand">Brand / company</label>
                   <input id="f-brand" name="company" type="text" autoComplete="organization" />
                 </div>
-                <div className={cx("field full")}>
+                <div className={cx("field")}>
                   <label htmlFor="f-type">Project type</label>
                   <select id="f-type" name="type" defaultValue="">
                     <option value="">Choose one</option>
-                    <option>Runway show</option>
-                    <option>Editorial shoot</option>
-                    <option>Brand or commercial campaign</option>
-                    <option>Film or screen</option>
-                    <option>Stage or live event</option>
-                    <option>Something else</option>
+                    {contact.projectTypes.map((t, i) => (
+                      <option key={i}>{t}</option>
+                    ))}
                   </select>
                 </div>
+                <input
+                  name="website"
+                  type="text"
+                  tabIndex={-1}
+                  autoComplete="off"
+                  aria-hidden="true"
+                  style={{ position: "absolute", left: "-10000px", width: 1, height: 1, opacity: 0 }}
+                />
                 <div className={cx("field full")}>
                   <label htmlFor="f-msg">Message</label>
                   <textarea id="f-msg" name="message" rows={4} />
                 </div>
                 <div className={cx("f-row")}>
-                  <button className={cx("cta")} type="submit" data-magnetic="">
-                    <span className={cx("ci")}>Book Chaithrika</span>
+                  <button className={cx("cta")} type="submit" data-magnetic="" disabled={sending}>
+                    <span className={cx("ci")}>{sending ? "Sending…" : contact.button}</span>
                     <Arrow />
                   </button>
                   <p className={cx("thanks")} id="f-thanks" role="status" aria-live="polite">
@@ -899,9 +824,13 @@ export default function Design10({
           </p>
           <div className={cx("foot-row")}>
             <ul>
-              <li>
-                <a href="#">Instagram</a>
-              </li>
+              {footer.instagram && (
+                <li>
+                  <a href={footer.instagram} target="_blank" rel="noopener noreferrer">
+                    Instagram
+                  </a>
+                </li>
+              )}
               <li>
                 <a href="#contact">Book</a>
               </li>
@@ -914,7 +843,7 @@ export default function Design10({
                 </li>
               )}
             </ul>
-            <p>&copy; Chaithrika · Child model &amp; actress, India</p>
+            <p>{footer.copyright}</p>
             {preview && (
               <p className={cx("foot-design")}>
                 <span>Design option 10 of 10 — Ultra Premium Creative</span>
