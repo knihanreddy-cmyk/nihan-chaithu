@@ -24,22 +24,15 @@ export default async function PanelLayout({ children }: { children: React.ReactN
   ].filter(Boolean) as string[];
 
   return (
-    <div className="admin relative min-h-svh bg-[#F3EFF4] font-inter text-[#2A1B2E] md:flex">
-      {/* Soft colour field, as on the homepage and the login */}
-      <div aria-hidden="true" className="pointer-events-none fixed inset-0 overflow-hidden">
-        <div className="absolute -left-40 -top-40 h-[34rem] w-[34rem] rounded-full bg-[#F4B6C8] opacity-50 blur-[120px]" />
-        <div className="absolute -bottom-56 -right-40 h-[38rem] w-[38rem] rounded-full bg-[#A9D8D0] opacity-45 blur-[130px]" />
-        <div className="absolute left-1/2 top-1/4 h-80 w-80 rounded-full bg-[#F7D9A8] opacity-30 blur-[110px]" />
-      </div>
-
+    <div className="min-h-svh md:flex">
       <AdminNav unread={unread} />
-      <div className="relative min-w-0 flex-1">
+      <div className="min-w-0 flex-1">
         {missing.length > 0 && (
-          <div className="mx-4 mt-4 rounded-2xl border border-amber-200 bg-amber-50/90 px-4 py-3 text-sm text-amber-900 backdrop-blur md:mx-10 md:mt-6">
+          <div className="mx-4 mt-4 rounded-[14px] border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-900 md:mx-14 md:mt-8">
             <strong>Setup needed:</strong> add {missing.join(" and ")} to <code>.env</code> and restart the server.
           </div>
         )}
-        <main className="mx-auto max-w-6xl px-4 py-6 md:px-10 md:py-10">{children}</main>
+        <main className="mx-auto max-w-[1180px] px-4 pb-14 pt-6 sm:px-8 md:px-14 md:pt-8">{children}</main>
       </div>
     </div>
   );

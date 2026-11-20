@@ -13,6 +13,9 @@
   --font-playfair: var(--font-playfair);
   --font-bebas: var(--font-bebas);
   --font-inter: var(--font-inter);
+  /* Admin (Ivory Editorial), set in src/app/admin/layout.tsx */
+  --font-fraunces: var(--f-admin-display);
+  --font-manrope: var(--f-admin-text);
 }
 
 * {

@@ -14,12 +14,12 @@ export default async function EnquiriesPage() {
   return (
     <div>
       <header className="mb-6">
-        <h1 className="font-playfair text-4xl leading-tight">Enquiries</h1>
-        <p className="mt-1 text-sm text-[#2A1B2E]/55">Messages sent from the booking forms on Chaithrika&apos;s and Nihan&apos;s pages.</p>
+        <h1 className="font-fraunces text-5xl font-light leading-[.96] tracking-tight">Enquiries</h1>
+        <p className="mt-1 text-sm text-[#1E1B18]/55">Messages sent from the booking forms on Chaithrika&apos;s and Nihan&apos;s pages.</p>
       </header>
 
       {list.length === 0 ? (
-        <p className="rounded-[22px] bg-white/80 p-8 text-center text-sm text-[#2A1B2E]/55 ring-1 ring-[#2A1B2E]/10">No enquiries yet.</p>
+        <p className="rounded-[14px] bg-[#FFFDF9] p-8 text-center text-sm text-[#1E1B18]/55 ring-1 ring-[#1E1B18]/10">No enquiries yet.</p>
       ) : (
         <ul className="space-y-3">
           {list.map((e) => {
@@ -31,12 +31,12 @@ export default async function EnquiriesPage() {
                 ? `tel:${contact.replace(/[^\d+]/g, "")}`
                 : null;
             return (
-              <li key={id} className={`rounded-[22px] bg-white/80 p-5 ${e.read ? "ring-1 ring-[#2A1B2E]/10" : "ring-2 ring-[#D9577F]"}`}>
+              <li key={id} className={`rounded-[14px] border bg-[#FFFDF9] p-5 ${e.read ? "border-[#DDD3C6]" : "border-[#1E1B18] shadow-[5px_5px_0_#E7C9D2]"}`}>
                 <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
-                  {!e.read && <span className="rounded-full bg-[#2A1B2E] px-2 py-0.5 text-[11px] font-semibold text-white">New</span>}
+                  {!e.read && <span className="text-[11px] font-semibold tracking-[0.12em] text-[#9C3F5C]">● NEW</span>}
                   <span className="font-semibold">{e.name}</span>
-                  {e.company && <span className="text-sm text-[#2A1B2E]/55">{e.company}</span>}
-                  <span className="ml-auto text-xs text-[#2A1B2E]/55">
+                  {e.company && <span className="text-sm text-[#1E1B18]/55">{e.company}</span>}
+                  <span className="ml-auto text-xs text-[#1E1B18]/55">
                     {e.page === "nihan" ? "Nihan" : "Chaithrika"} · {fmt(e.createdAt)}
                   </span>
                 </div>
@@ -51,11 +51,11 @@ export default async function EnquiriesPage() {
                     )}
                   </p>
                 )}
-                {e.type && <p className="mt-1 text-xs font-medium uppercase tracking-wider text-[#2A1B2E]/55">{e.type}</p>}
-                {e.message && <p className="mt-3 whitespace-pre-wrap text-sm text-[#2A1B2E]/85">{e.message}</p>}
+                {e.type && <p className="mt-1 text-xs font-medium uppercase tracking-wider text-[#1E1B18]/55">{e.type}</p>}
+                {e.message && <p className="mt-3 whitespace-pre-wrap text-sm text-[#1E1B18]/85">{e.message}</p>}
                 <div className="mt-4 flex gap-4 text-sm">
                   <form action={setEnquiryRead.bind(null, id, !e.read)}>
-                    <button type="submit" className="text-[#2A1B2E]/65 hover:text-[#2A1B2E]">
+                    <button type="submit" className="text-[#1E1B18]/65 hover:text-[#1E1B18]">
                       Mark as {e.read ? "unread" : "read"}
                     </button>
                   </form>

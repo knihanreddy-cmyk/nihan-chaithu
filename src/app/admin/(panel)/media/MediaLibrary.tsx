@@ -43,25 +43,25 @@ export default function MediaLibrary({ initial }: { initial: MediaItem[] }) {
           placeholder="Search by file name"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          className="min-w-0 flex-1 rounded-lg border border-[#2A1B2E]/15 bg-white px-3 py-2 text-sm sm:max-w-xs"
+          className="min-w-0 flex-1 rounded-lg border border-[#1E1B18]/15 bg-[#FFFDF9] px-3 py-2 text-sm sm:max-w-xs"
         />
-        <span className="text-sm text-[#2A1B2E]/55">{items.length} photos</span>
+        <span className="text-sm text-[#1E1B18]/55">{items.length} photos</span>
       </div>
       {message && (
-        <p className="mt-3 rounded-lg bg-white p-3 text-sm ring-1 ring-[#2A1B2E]/10" role="status">
+        <p className="mt-3 rounded-[14px] border border-[#DDD3C6] bg-[#FFFDF9] p-3 text-sm" role="status">
           {message}
         </p>
       )}
 
       {shown.length === 0 ? (
-        <p className="mt-6 rounded-[22px] border border-dashed border-[#2A1B2E]/15 bg-white/40 p-12 text-center text-sm text-[#2A1B2E]/55 backdrop-blur">
+        <p className="mt-6 border-y border-[#DDD3C6] py-12 text-center text-sm text-[#6B635A]">
           {items.length ? "No photos match." : "No photos yet. Upload some to get started."}
         </p>
       ) : (
         <ul className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
           {shown.map((m) => (
-            <li key={m.id} className="overflow-hidden rounded-[22px] border border-white/70 bg-white/65 shadow-[0_24px_60px_-40px_rgba(42,27,46,.5)] backdrop-blur-xl">
-              <div className="aspect-[4/5] bg-[#E9DDF0]">
+            <li key={m.id} className="overflow-hidden rounded-[14px] border border-[#DDD3C6] bg-[#FFFDF9]">
+              <div className="aspect-[4/5] bg-[#EDE5D8]">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={thumb(m.url, 480)} alt="" loading="lazy" className="h-full w-full object-cover" />
               </div>
@@ -69,14 +69,14 @@ export default function MediaLibrary({ initial }: { initial: MediaItem[] }) {
                 <p className="truncate text-sm font-medium" title={m.name}>
                   {m.name}
                 </p>
-                <p className="text-xs text-[#2A1B2E]/55">
+                <p className="text-xs text-[#1E1B18]/55">
                   {m.width}×{m.height} · {kb(m.size)}
                 </p>
                 <div className="mt-2 flex gap-3 text-xs">
-                  <button type="button" className="text-[#2A1B2E]/65 hover:text-[#2A1B2E]" onClick={() => copy(m.url)}>
+                  <button type="button" className="text-[#1E1B18]/65 hover:text-[#1E1B18]" onClick={() => copy(m.url)}>
                     Copy link
                   </button>
-                  <a className="text-[#2A1B2E]/65 hover:text-[#2A1B2E]" href={m.url} target="_blank" rel="noreferrer">
+                  <a className="text-[#1E1B18]/65 hover:text-[#1E1B18]" href={m.url} target="_blank" rel="noreferrer">
                     Open
                   </a>
                   <button

@@ -8,8 +8,8 @@ import MediaPicker from "./MediaPicker";
 type Obj = Record<string, unknown>;
 
 const inputCls =
-  "mt-1 block w-full rounded-lg border border-[#2A1B2E]/15 bg-white px-3 py-2 text-sm outline-none focus:border-[#D9577F] focus:ring-2 focus:ring-[#D9577F]/15";
-const smallBtn = "rounded-md px-2 py-1 text-xs font-medium text-[#2A1B2E]/65 hover:bg-[#2A1B2E]/5 hover:text-[#2A1B2E] disabled:opacity-30";
+  "mt-1 block w-full rounded-lg border border-[#1E1B18]/15 bg-[#FFFDF9] px-3 py-2 text-sm outline-none focus:border-[#9C3F5C] focus:ring-2 focus:ring-[#9C3F5C]/15";
+const smallBtn = "rounded-md px-2 py-1 text-xs font-medium text-[#1E1B18]/65 hover:bg-[#1E1B18]/5 hover:text-[#1E1B18] disabled:opacity-30";
 
 function Label({ field, children }: { field: Field; children?: ReactNode }) {
   return (
@@ -21,7 +21,7 @@ function Label({ field, children }: { field: Field; children?: ReactNode }) {
 }
 
 function Help({ text }: { text?: string }) {
-  return text ? <p className="mt-1 text-xs text-[#2A1B2E]/55">{text}</p> : null;
+  return text ? <p className="mt-1 text-xs text-[#1E1B18]/55">{text}</p> : null;
 }
 
 function move<T>(list: T[], from: number, to: number): T[] {
@@ -39,11 +39,11 @@ function ImageField({ field, value, onChange }: { field: Field; value: Img; onCh
   return (
     <div>
       <Label field={field} />
-      <div className="mt-1 flex gap-4 rounded-lg border border-[#2A1B2E]/10 bg-[#F3EFF4]/60 p-3">
+      <div className="mt-1 flex gap-4 rounded-lg border border-[#1E1B18]/10 bg-[#F5F0E8]/60 p-3">
         <button
           type="button"
           onClick={() => setOpen(true)}
-          className="h-28 w-24 shrink-0 overflow-hidden rounded-md bg-[#E9DDF0] ring-1 ring-[#2A1B2E]/10 hover:ring-2 hover:ring-[#D9577F]"
+          className="h-28 w-24 shrink-0 overflow-hidden rounded-md bg-[#EDE5D8] ring-1 ring-[#1E1B18]/10 hover:ring-2 hover:ring-[#9C3F5C]"
           aria-label={`Change ${field.label}`}
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -59,20 +59,20 @@ function ImageField({ field, value, onChange }: { field: Field; value: Img; onCh
             <button
               type="button"
               onClick={() => setOpen(true)}
-              className="rounded-full bg-white px-3.5 py-1.5 text-sm font-medium ring-1 ring-[#2A1B2E]/15 hover:ring-[#D9577F]"
+              className="rounded-[12px] bg-[#FFFDF9] px-3.5 py-1.5 text-sm font-medium ring-1 ring-[#1E1B18]/15 hover:ring-[#9C3F5C]"
             >
               Change photo
             </button>
-            <span className="truncate text-xs text-[#2A1B2E]/55" title={value.src}>
+            <span className="truncate text-xs text-[#1E1B18]/55" title={value.src}>
               {value.src.startsWith("/") ? "Built-in photo" : "ImageKit"} · {value.width}×{value.height}
             </span>
           </div>
           <label className="block">
-            <span className="text-xs font-medium text-[#2A1B2E]/65">Description (alt text, for screen readers and Google)</span>
+            <span className="text-xs font-medium text-[#1E1B18]/65">Description (alt text, for screen readers and Google)</span>
             <input className={inputCls} value={value.alt} onChange={(e) => onChange({ ...value, alt: e.target.value })} />
           </label>
           <label className="block">
-            <span className="text-xs font-medium text-[#2A1B2E]/65">Focus point (optional, e.g. &quot;50% 20%&quot; keeps the top in view)</span>
+            <span className="text-xs font-medium text-[#1E1B18]/65">Focus point (optional, e.g. &quot;50% 20%&quot; keeps the top in view)</span>
             <input
               className={inputCls}
               value={value.position ?? ""}
@@ -111,7 +111,7 @@ function StringsField({
       <ol className="mt-2 space-y-2">
         {value.map((s, i) => (
           <li key={i} className="flex items-start gap-2">
-            <span className="mt-2.5 w-5 shrink-0 text-right text-xs text-[#2A1B2E]/40">{i + 1}</span>
+            <span className="mt-2.5 w-5 shrink-0 text-right text-xs text-[#1E1B18]/40">{i + 1}</span>
             {long ? (
               <textarea
                 className={`${inputCls} mt-0`}
@@ -148,7 +148,7 @@ function StringsField({
           </li>
         ))}
       </ol>
-      <button type="button" className="mt-2 text-sm font-medium text-[#2A1B2E]/80 hover:text-[#2A1B2E]" onClick={() => onChange([...value, ""])}>
+      <button type="button" className="mt-2 text-sm font-medium text-[#1E1B18]/80 hover:text-[#1E1B18]" onClick={() => onChange([...value, ""])}>
         + Add {(field.itemLabel ?? "item").toLowerCase()}
       </button>
     </div>
@@ -179,10 +179,10 @@ function ListField({
   return (
     <div>
       <Label field={field}>
-        <span className="text-xs text-[#2A1B2E]/55">{value.length} items</span>
+        <span className="text-xs text-[#1E1B18]/55">{value.length} items</span>
       </Label>
       <Help text={field.help} />
-      <ol className="mt-2 divide-y divide-[#2A1B2E]/10 overflow-hidden rounded-lg border border-[#2A1B2E]/10 bg-white">
+      <ol className="mt-2 divide-y divide-[#1E1B18]/10 overflow-hidden rounded-[14px] border border-[#DDD3C6] bg-[#FFFDF9]">
         {value.map((item, i) => {
           const isOpen = openIdx === i;
           const src = imgOf(item);
@@ -195,13 +195,13 @@ function ListField({
                   aria-expanded={isOpen}
                   onClick={() => setOpenIdx(isOpen ? null : i)}
                 >
-                  <span className="w-5 shrink-0 text-right text-xs text-[#2A1B2E]/40">{i + 1}</span>
+                  <span className="w-5 shrink-0 text-right text-xs text-[#1E1B18]/40">{i + 1}</span>
                   {src && (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img src={thumb(src, 120)} alt="" className="h-10 w-10 shrink-0 rounded object-cover" />
                   )}
                   <span className="truncate text-sm font-medium">{titleOf(item, i)}</span>
-                  <span className="ml-auto text-xs text-[#2A1B2E]/40">{isOpen ? "Close" : "Edit"}</span>
+                  <span className="ml-auto text-xs text-[#1E1B18]/40">{isOpen ? "Close" : "Edit"}</span>
                 </button>
                 <div className="flex shrink-0">
                   <button
@@ -245,7 +245,7 @@ function ListField({
                 </div>
               </div>
               {isOpen && (
-                <div className="space-y-4 border-t border-[#2A1B2E]/5 bg-[#F3EFF4]/50 p-4">
+                <div className="space-y-4 border-t border-[#1E1B18]/5 bg-[#F5F0E8]/50 p-4">
                   <Fields fields={field.fields} value={item} onChange={(v) => onChange(value.map((x, j) => (j === i ? v : x)))} />
                 </div>
               )}
@@ -256,7 +256,7 @@ function ListField({
       {!field.fixed && (
         <button
           type="button"
-          className="mt-2 text-sm font-medium text-[#2A1B2E]/80 hover:text-[#2A1B2E]"
+          className="mt-2 text-sm font-medium text-[#1E1B18]/80 hover:text-[#1E1B18]"
           onClick={() => {
             onChange([...value, blankObject(field.fields)]);
             setOpenIdx(value.length);
@@ -298,7 +298,7 @@ export function FieldInput({ field, value, onChange }: { field: Field; value: un
     case "boolean":
       return (
         <label className="flex items-center gap-2">
-          <input type="checkbox" className="h-4 w-4 accent-[#D9577F]" checked={Boolean(value)} onChange={(e) => onChange(e.target.checked)} />
+          <input type="checkbox" className="h-4 w-4 accent-[#9C3F5C]" checked={Boolean(value)} onChange={(e) => onChange(e.target.checked)} />
           <span className="text-sm font-medium">{field.label}</span>
         </label>
       );
@@ -324,7 +324,7 @@ export function FieldInput({ field, value, onChange }: { field: Field; value: un
       return <ListField field={field} value={(value as Obj[]) ?? []} onChange={onChange} />;
     case "group":
       return (
-        <fieldset className="rounded-lg border border-[#2A1B2E]/10 p-4">
+        <fieldset className="rounded-lg border border-[#1E1B18]/10 p-4">
           <legend className="px-1 text-sm font-semibold">{field.label}</legend>
           <div className="space-y-4">
             <Fields fields={field.fields} value={(value as Obj) ?? {}} onChange={onChange} />

@@ -7,6 +7,14 @@ import { Fields } from "./fields";
 
 type Obj = Record<string, unknown>;
 
+/** Fixed locale and time zone, so the server and the browser render the same text. */
+const stamp = (iso: string, withDate = true) =>
+  new Intl.DateTimeFormat("en-IN", {
+    ...(withDate ? { dateStyle: "medium" as const } : {}),
+    timeStyle: "short",
+    timeZone: "Asia/Kolkata",
+  }).format(new Date(iso));
+
 export default function ContentEditor({
   schema,
   initial,
@@ -21,7 +29,7 @@ export default function ContentEditor({
   const [value, setValue] = useState<Obj>(initial);
   const [saved, setSaved] = useState<Obj>(initial);
   const [status, setStatus] = useState<{ kind: "ok" | "error"; text: string } | null>(
-    savedAt ? { kind: "ok", text: `Last saved ${new Date(savedAt).toLocaleString()}` } : null,
+    savedAt ? { kind: "ok", text: `Last saved ${stamp(savedAt)}` } : null,
   );
   const [pending, startTransition] = useTransition();
   const dirty = JSON.stringify(value) !== JSON.stringify(saved);
@@ -33,7 +41,7 @@ export default function ContentEditor({
       const res = await saveContent(schema.id, snapshot);
       if (res.ok) {
         setSaved(snapshot);
-        setStatus({ kind: "ok", text: `Saved ${new Date(res.savedAt).toLocaleTimeString()} — live on the site now.` });
+        setStatus({ kind: "ok", text: `Saved ${stamp(res.savedAt, false)} — live on the site now.` });
       } else setStatus({ kind: "error", text: res.error });
     });
   }, [canSave, pending, schema.id, value]);
@@ -59,21 +67,21 @@ export default function ContentEditor({
 
   return (
     <div>
-      <div className="sticky top-[100px] z-10 mb-6 flex flex-wrap items-center gap-3 rounded-[22px] border border-white/70 bg-white/70 px-5 py-3 shadow-[0_20px_50px_-35px_rgba(42,27,46,.6)] backdrop-blur-xl md:top-4">
+      <div className="sticky top-[97px] z-10 mb-8 flex flex-wrap items-end gap-3 border-b border-[#1E1B18] bg-[#F5F0E8]/95 pb-4 pt-3 backdrop-blur md:top-0 md:pt-6">
         <div className="mr-auto min-w-0">
-          <h1 className="font-playfair text-3xl leading-tight">{schema.title}</h1>
-          <p className={`text-xs ${status?.kind === "error" ? "text-red-700" : "text-[#2A1B2E]/55"}`} role="status">
+          <h1 className="font-fraunces text-[34px] font-light leading-tight">{schema.title}</h1>
+          <p className={`text-xs ${status?.kind === "error" ? "text-red-700" : "text-[#1E1B18]/55"}`} role="status">
             {dirty ? "Unsaved changes" : (status?.text ?? "Showing the built-in content. Save to store it in the database.")}
           </p>
         </div>
-        <a href={schema.path} target="_blank" className="rounded-full px-3.5 py-2 text-sm font-medium text-[#2A1B2E]/65 hover:bg-white">
+        <a href={schema.path} target="_blank" className="rounded-[12px] px-3.5 py-2 text-sm font-medium text-[#1E1B18]/65 hover:bg-[#1E1B18]/5">
           View page ↗
         </a>
         {dirty && (
           <button
             type="button"
             onClick={() => setValue(saved)}
-            className="rounded-full px-3.5 py-2 text-sm font-medium text-[#2A1B2E]/65 hover:bg-white"
+            className="rounded-[12px] px-3.5 py-2 text-sm font-medium text-[#1E1B18]/65 hover:bg-[#1E1B18]/5"
           >
             Discard
           </button>
@@ -82,7 +90,7 @@ export default function ContentEditor({
           type="button"
           onClick={save}
           disabled={!canSave || pending || !dirty}
-          className="rounded-full bg-[#2A1B2E] px-5 py-2 text-sm font-semibold text-white hover:bg-[#3B2741] disabled:opacity-40"
+          className="rounded-[14px] bg-[#1E1B18] px-5 py-2 text-sm font-semibold text-[#F5F0E8] hover:bg-[#3A3530] disabled:opacity-40"
           title={canSave ? "Save (Ctrl+S)" : "Set MONGODB_URI to enable saving"}
         >
           {pending ? "Saving…" : "Save & publish"}
@@ -91,14 +99,14 @@ export default function ContentEditor({
 
       <div className="space-y-4">
         {schema.sections.map((section, i) => (
-          <details key={section.key} open={i === 0} className="group rounded-[22px] border border-white/70 bg-white/65 shadow-[0_24px_60px_-40px_rgba(42,27,46,.5)] backdrop-blur-xl">
-            <summary className="flex cursor-pointer list-none items-center justify-between px-5 py-4 font-semibold">
+          <details key={section.key} open={i === 0} className="group rounded-[14px] border border-[#DDD3C6] bg-[#FFFDF9]">
+            <summary className="flex cursor-pointer list-none items-center justify-between px-5 py-4 font-fraunces text-[22px]">
               {section.label}
-              <span className="text-sm font-normal text-[#2A1B2E]/40 group-open:rotate-180" aria-hidden="true">
+              <span className="text-sm font-normal text-[#1E1B18]/40 group-open:rotate-180" aria-hidden="true">
                 ▾
               </span>
             </summary>
-            <div className="space-y-5 border-t border-[#2A1B2E]/5 px-5 py-5">
+            <div className="space-y-5 border-t border-[#1E1B18]/5 px-5 py-5">
               <Fields
                 fields={section.fields}
                 value={(value[section.key] as Obj) ?? {}}
@@ -112,7 +120,7 @@ export default function ContentEditor({
       {canSave && (
         <form
           action={resetContent.bind(null, schema.id)}
-          className="mt-10 border-t border-[#2A1B2E]/10 pt-6"
+          className="mt-10 border-t border-[#1E1B18]/10 pt-6"
           onSubmit={(e) => {
             if (!confirm("Reset this page to the original built-in words and photos? Your saved edits will be deleted.")) e.preventDefault();
           }}

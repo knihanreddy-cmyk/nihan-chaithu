@@ -5,62 +5,45 @@ import { usePageBackground } from "@/components/designs/shared";
 import { login } from "../actions";
 
 const inputCls =
-  "peer block w-full rounded-2xl border border-[#2A1B2E]/15 bg-white/80 px-4 pb-2.5 pt-6 text-[15px] text-[#2A1B2E] outline-none transition placeholder-transparent focus:border-[#D9577F] focus:bg-white focus:ring-4 focus:ring-[#D9577F]/15";
-const labelCls =
-  "pointer-events-none absolute left-4 top-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-[#2A1B2E]/50 transition-all peer-placeholder-shown:top-4 peer-placeholder-shown:text-sm peer-placeholder-shown:font-normal peer-placeholder-shown:normal-case peer-placeholder-shown:tracking-normal peer-focus:top-2 peer-focus:text-[11px] peer-focus:font-semibold peer-focus:uppercase peer-focus:tracking-[0.14em] peer-focus:text-[#D9577F]";
+  "mt-1.5 block h-[54px] w-full rounded-[14px] border border-[#CFC6BA] bg-[#FFFDF9] px-[18px] text-[15px] text-[#1E1B18] outline-none transition focus:border-[1.5px] focus:border-[#1E1B18] focus:shadow-[4px_4px_0_#E7C9D2]";
+const labelCls = "block text-xs font-semibold tracking-[0.08em] text-[#5A534B]";
 
 export default function LoginForm({ next }: { next: string }) {
-  usePageBackground("#F3EFF4");
+  usePageBackground("#F5F0E8");
   const [state, action, pending] = useActionState(login, null);
   const [show, setShow] = useState(false);
 
   return (
-    <form action={action} className="mt-7 space-y-4">
+    <form action={action} className="mt-8 flex flex-col gap-3.5">
       <input type="hidden" name="next" value={next} />
 
-      <div className="relative">
-        <input
-          id="login-email"
-          name="email"
-          type="email"
-          autoComplete="username"
-          placeholder="Email"
-          required
-          autoFocus
-          className={inputCls}
-        />
-        <label htmlFor="login-email" className={labelCls}>
-          Email
-        </label>
-      </div>
+      <label className="block">
+        <span className={labelCls}>Email</span>
+        <input name="email" type="email" autoComplete="username" required autoFocus className={inputCls} />
+      </label>
 
-      <div className="relative">
+      <label className="relative block">
+        <span className={labelCls}>Password</span>
         <input
-          id="login-password"
           name="password"
           type={show ? "text" : "password"}
           autoComplete="current-password"
-          placeholder="Password"
           required
-          className={`${inputCls} pr-16`}
+          className={`${inputCls} pr-[70px]`}
         />
-        <label htmlFor="login-password" className={labelCls}>
-          Password
-        </label>
         <button
           type="button"
           onClick={() => setShow((s) => !s)}
-          className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full px-3 py-1.5 text-xs font-medium text-[#2A1B2E]/60 hover:bg-[#2A1B2E]/5 hover:text-[#2A1B2E]"
+          className="absolute bottom-[5px] right-1.5 h-11 rounded-[10px] px-3.5 text-[13px] font-medium text-[#5A534B] hover:bg-[#1E1B18]/5 hover:text-[#1E1B18]"
           aria-label={show ? "Hide password" : "Show password"}
           aria-pressed={show}
         >
           {show ? "Hide" : "Show"}
         </button>
-      </div>
+      </label>
 
       {state?.error && (
-        <p className="flex items-center gap-2 rounded-2xl bg-[#D9577F]/10 px-4 py-3 text-sm text-[#9E2F52]" role="alert">
-          <span aria-hidden="true" className="h-1.5 w-1.5 shrink-0 rounded-full bg-[#D9577F]" />
+        <p className="rounded-[14px] border border-[#E7C9D2] bg-[#9C3F5C]/[.06] px-4 py-3 text-sm text-[#7A2E47]" role="alert">
           {state.error}
         </p>
       )}
@@ -68,19 +51,19 @@ export default function LoginForm({ next }: { next: string }) {
       <button
         type="submit"
         disabled={pending}
-        className="group relative mt-2 flex w-full items-center justify-center gap-2 overflow-hidden rounded-full bg-[#2A1B2E] px-6 py-4 text-sm font-semibold tracking-wide text-white shadow-[0_14px_30px_-12px_rgba(42,27,46,.7)] transition hover:bg-[#3B2741] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#D9577F]/30 disabled:cursor-wait disabled:opacity-70"
+        className="group mt-3.5 flex h-[58px] items-center justify-center gap-3 rounded-[14px] bg-[#1E1B18] text-[15px] font-semibold text-[#F5F0E8] transition hover:bg-[#3A3530] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#E7C9D2] disabled:cursor-wait disabled:opacity-70"
       >
         {pending ? (
           <>
-            <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" aria-hidden="true" />
+            <span className="h-4 w-4 animate-spin rounded-full border-2 border-[#F5F0E8]/30 border-t-[#F5F0E8]" aria-hidden="true" />
             Signing in…
           </>
         ) : (
           <>
-            Sign in
+            Enter the studio
             <svg
               viewBox="0 0 24 24"
-              className="h-4 w-4 transition-transform group-hover:translate-x-0.5"
+              className="h-[18px] w-[18px] transition-transform group-hover:translate-x-0.5"
               fill="none"
               stroke="currentColor"
               strokeWidth="1.8"

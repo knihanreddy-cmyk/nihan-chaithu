@@ -1,121 +1,106 @@
 "use client";
 
-import { Compass, ExternalLink, House, Images, Inbox, LayoutDashboard, LogOut, Sparkles, type LucideIcon } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { usePageBackground } from "@/components/designs/shared";
 import { logout } from "../actions";
 
-const LINKS: { href: string; label: string; icon: LucideIcon; group: "main" | "pages" | "library" }[] = [
-  { href: "/admin", label: "Dashboard", icon: LayoutDashboard, group: "main" },
-  { href: "/admin/pages/home", label: "Home page", icon: House, group: "pages" },
-  { href: "/admin/pages/chaithrika", label: "Chaithrika", icon: Sparkles, group: "pages" },
-  { href: "/admin/pages/nihan", label: "Nihan", icon: Compass, group: "pages" },
-  { href: "/admin/media", label: "Photos", icon: Images, group: "library" },
-  { href: "/admin/enquiries", label: "Enquiries", icon: Inbox, group: "library" },
+const LINKS = [
+  { href: "/admin", label: "Overview" },
+  { href: "/admin/pages/home", label: "Home page" },
+  { href: "/admin/pages/chaithrika", label: "Chaithrika" },
+  { href: "/admin/pages/nihan", label: "Nihan" },
+  { href: "/admin/media", label: "Photos" },
+  { href: "/admin/enquiries", label: "Enquiries" },
 ];
 
-const GROUPS = [
-  { id: "main", label: "" },
-  { id: "pages", label: "Pages" },
-  { id: "library", label: "Library" },
-] as const;
-
 export default function AdminNav({ unread }: { unread: number }) {
-  usePageBackground("#F3EFF4");
+  usePageBackground("#F5F0E8");
   const pathname = usePathname();
   const isActive = (href: string) => (href === "/admin" ? pathname === href : pathname.startsWith(href));
 
-  const item = (l: (typeof LINKS)[number], compact = false) => {
-    const Icon = l.icon;
-    const badge = l.href === "/admin/enquiries" && unread > 0 ? unread : 0;
-    return (
-      <Link
-        key={l.href}
-        href={l.href}
-        aria-current={isActive(l.href) ? "page" : undefined}
-        className={`group flex items-center gap-3 whitespace-nowrap rounded-full text-sm font-medium text-[#2A1B2E]/65 transition hover:bg-white/70 hover:text-[#2A1B2E] aria-[current=page]:bg-[#2A1B2E] aria-[current=page]:text-white aria-[current=page]:shadow-[0_10px_24px_-12px_rgba(42,27,46,.8)] ${
-          compact ? "px-3.5 py-2" : "px-4 py-2.5"
-        }`}
-      >
-        <Icon className="h-4.5 w-4.5 shrink-0" strokeWidth={1.7} aria-hidden="true" />
-        {l.label}
-        {badge > 0 && (
-          <span className="ml-auto rounded-full bg-[#D9577F] px-2 py-0.5 text-[11px] font-semibold leading-none text-white">
-            {badge}
-            <span className="sr-only"> unread</span>
-          </span>
-        )}
-      </Link>
-    );
-  };
-
   return (
     <>
-      {/* Desktop: glass sidebar */}
-      <aside className="sticky top-0 z-20 hidden h-svh w-72 shrink-0 p-4 md:block">
-        <div className="flex h-full flex-col rounded-[28px] border border-white/70 bg-white/55 p-5 shadow-[0_30px_80px_-50px_rgba(42,27,46,.6)] backdrop-blur-xl">
-          <Link href="/admin" className="block px-2 pt-1">
-            <span className="block font-playfair text-[1.45rem] leading-tight tracking-tight">
-              Chaithrika <i className="text-[#D9577F]">&amp;</i> Nihan
-            </span>
-            <span className="mt-1 block text-[11px] font-semibold uppercase tracking-[0.22em] text-[#2A1B2E]/45">
-              Portfolio CMS
-            </span>
-          </Link>
+      {/* Desktop: a slim editorial rail */}
+      <aside className="sticky top-0 hidden h-svh w-60 shrink-0 flex-col gap-9 border-r border-[#DDD3C6] px-7 py-8 md:flex">
+        <Link href="/admin" className="block">
+          <span className="block font-fraunces text-[26px] leading-[1.05]">
+            Chaithrika
+            <br />
+            <i className="text-[#9C3F5C]">&amp;</i> Nihan
+          </span>
+          <span className="mt-2.5 block text-[11px] font-semibold tracking-[0.2em] text-[#6B635A]">STUDIO EDITION</span>
+        </Link>
 
-          <nav className="mt-8 flex-1 space-y-6" aria-label="Admin">
-            {GROUPS.map((g) => (
-              <div key={g.id}>
-                {g.label && (
-                  <p className="mb-2 px-4 text-[11px] font-semibold uppercase tracking-[0.18em] text-[#2A1B2E]/40">{g.label}</p>
+        <nav aria-label="Admin" className="flex flex-col">
+          {LINKS.map((l, i) => {
+            const active = isActive(l.href);
+            return (
+              <Link
+                key={l.href}
+                href={l.href}
+                aria-current={active ? "page" : undefined}
+                className="group flex min-h-11 items-baseline gap-3 pt-2.5 text-[15px] text-[#5A534B] transition-colors hover:text-[#1E1B18] aria-[current=page]:font-semibold aria-[current=page]:text-[#1E1B18]"
+              >
+                <span className="font-fraunces text-[13px] text-[#6B635A] group-aria-[current=page]:text-[#9C3F5C]">
+                  {String(i + 1).padStart(2, "0")}
+                </span>
+                <span className="relative">
+                  {l.label}
+                  {active && <span aria-hidden="true" className="absolute -bottom-1 left-0 h-px w-full bg-[#9C3F5C]" />}
+                </span>
+                {l.href === "/admin/enquiries" && unread > 0 && (
+                  <span className="text-xs font-semibold text-[#9C3F5C]">{unread} new</span>
                 )}
-                <div className="space-y-1">{LINKS.filter((l) => l.group === g.id).map((l) => item(l))}</div>
-              </div>
-            ))}
-          </nav>
+              </Link>
+            );
+          })}
+        </nav>
 
-          <div className="space-y-1 border-t border-[#2A1B2E]/10 pt-4">
-            <a
-              href="/"
-              target="_blank"
-              className="flex items-center gap-3 rounded-full px-4 py-2.5 text-sm font-medium text-[#2A1B2E]/65 hover:bg-white/70 hover:text-[#2A1B2E]"
-            >
-              <ExternalLink className="h-4.5 w-4.5" strokeWidth={1.7} aria-hidden="true" />
-              View website
+        <div className="mt-auto flex flex-col gap-1.5 text-[13px]">
+          <a href="/" target="_blank" className="text-[#9C3F5C] hover:text-[#6E2440]">
+            View website ↗
+          </a>
+          <form action={logout}>
+            <button type="submit" className="text-[#5A534B] hover:text-[#1E1B18]">
+              Sign out
+            </button>
+          </form>
+        </div>
+      </aside>
+
+      {/* Mobile: masthead + scrollable section tabs */}
+      <header className="sticky top-0 z-20 border-b border-[#1E1B18] bg-[#F5F0E8]/95 backdrop-blur md:hidden">
+        <div className="flex items-baseline justify-between px-4 pb-2 pt-3">
+          <Link href="/admin" className="font-fraunces text-xl">
+            Chaithrika <i className="text-[#9C3F5C]">&amp;</i> Nihan
+          </Link>
+          <div className="flex gap-4 text-[13px]">
+            <a href="/" target="_blank" className="text-[#9C3F5C]">
+              Site ↗
             </a>
             <form action={logout}>
-              <button
-                type="submit"
-                className="flex w-full items-center gap-3 rounded-full px-4 py-2.5 text-sm font-medium text-[#2A1B2E]/65 hover:bg-white/70 hover:text-[#9E2F52]"
-              >
-                <LogOut className="h-4.5 w-4.5" strokeWidth={1.7} aria-hidden="true" />
+              <button type="submit" className="text-[#5A534B]">
                 Sign out
               </button>
             </form>
           </div>
         </div>
-      </aside>
-
-      {/* Mobile: glass top bar with scrollable pills */}
-      <header className="sticky top-0 z-20 border-b border-white/60 bg-white/60 backdrop-blur-xl md:hidden">
-        <div className="flex items-center justify-between px-4 pb-2 pt-3">
-          <Link href="/admin" className="font-playfair text-lg tracking-tight">
-            Chaithrika <i className="text-[#D9577F]">&amp;</i> Nihan
-          </Link>
-          <div className="flex items-center gap-1">
-            <a href="/" target="_blank" className="rounded-full p-2 text-[#2A1B2E]/60 hover:bg-white" aria-label="View website">
-              <ExternalLink className="h-4.5 w-4.5" strokeWidth={1.7} />
-            </a>
-            <form action={logout}>
-              <button type="submit" className="rounded-full p-2 text-[#2A1B2E]/60 hover:bg-white" aria-label="Sign out">
-                <LogOut className="h-4.5 w-4.5" strokeWidth={1.7} />
-              </button>
-            </form>
-          </div>
-        </div>
-        <nav className="flex gap-1 overflow-x-auto px-3 pb-3" aria-label="Admin">
-          {LINKS.map((l) => item(l, true))}
+        <nav aria-label="Admin" className="flex gap-5 overflow-x-auto px-4 pb-2">
+          {LINKS.map((l, i) => (
+            <Link
+              key={l.href}
+              href={l.href}
+              aria-current={isActive(l.href) ? "page" : undefined}
+              className="flex min-h-11 shrink-0 items-center gap-1.5 whitespace-nowrap border-b-2 border-transparent text-sm text-[#5A534B] aria-[current=page]:border-[#9C3F5C] aria-[current=page]:font-semibold aria-[current=page]:text-[#1E1B18]"
+            >
+              <span className="font-fraunces text-xs text-[#9C3F5C]">{String(i + 1).padStart(2, "0")}</span>
+              {l.label}
+              {l.href === "/admin/enquiries" && unread > 0 && (
+                <span className="rounded-full bg-[#9C3F5C] px-1.5 text-[11px] font-semibold text-white">{unread}</span>
+              )}
+            </Link>
+          ))}
         </nav>
       </header>
     </>
