@@ -49,7 +49,7 @@ export default function UploadButton({
       />
       <label
         htmlFor={id}
-        className="inline-flex cursor-pointer items-center gap-2 rounded-lg bg-stone-900 px-4 py-2 text-sm font-semibold text-white hover:bg-stone-700 aria-disabled:opacity-60"
+        className="inline-flex cursor-pointer items-center gap-2 rounded-full bg-[#2A1B2E] px-4 py-2 text-sm font-semibold text-white hover:bg-[#3B2741] aria-disabled:opacity-60"
         aria-disabled={!!progress}
       >
         {progress ? `Uploading ${Math.min(progress.done + 1, progress.total)} of ${progress.total}…` : label}

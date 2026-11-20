@@ -52,17 +52,17 @@ export default function MediaPicker({
       ref={ref}
       onClose={onClose}
       onClick={(e) => e.target === ref.current && onClose()}
-      className="m-auto w-[min(960px,calc(100vw-24px))] max-h-[calc(100svh-24px)] rounded-2xl bg-white p-0 text-stone-900 shadow-xl backdrop:bg-stone-900/50"
+      className="m-auto w-[min(960px,calc(100vw-24px))] max-h-[calc(100svh-24px)] rounded-2xl bg-white p-0 text-[#2A1B2E] shadow-xl backdrop:bg-[#2A1B2E]/50"
     >
       <div className="flex max-h-[calc(100svh-24px)] flex-col">
-        <div className="flex flex-wrap items-center gap-3 border-b border-stone-200 p-4">
+        <div className="flex flex-wrap items-center gap-3 border-b border-[#2A1B2E]/10 p-4">
           <h2 className="mr-auto text-lg font-semibold">Choose a photo</h2>
           <input
             type="search"
             placeholder="Search"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            className="w-40 rounded-lg border border-stone-300 px-3 py-1.5 text-sm"
+            className="w-40 rounded-lg border border-[#2A1B2E]/15 px-3 py-1.5 text-sm"
           />
           <UploadButton
             multiple={false}
@@ -72,15 +72,15 @@ export default function MediaPicker({
               pick(item);
             }}
           />
-          <button type="button" onClick={onClose} className="rounded-lg px-3 py-2 text-sm text-stone-600 hover:bg-stone-100">
+          <button type="button" onClick={onClose} className="rounded-full px-3.5 py-2 text-sm text-[#2A1B2E]/65 hover:bg-[#2A1B2E]/5">
             Close
           </button>
         </div>
         <div className="min-h-[240px] overflow-y-auto p-4">
           {error && <p className="text-sm text-red-700">{error}</p>}
-          {!items && !error && <p className="text-sm text-stone-500">Loading photos…</p>}
+          {!items && !error && <p className="text-sm text-[#2A1B2E]/55">Loading photos…</p>}
           {items && shown.length === 0 && (
-            <p className="text-sm text-stone-500">
+            <p className="text-sm text-[#2A1B2E]/55">
               {items.length ? "No photos match." : "The library is empty. Upload a photo to use it here."}
             </p>
           )}
@@ -90,7 +90,7 @@ export default function MediaPicker({
                 <button
                   type="button"
                   onClick={() => pick(m)}
-                  className="group block w-full overflow-hidden rounded-lg ring-1 ring-stone-200 hover:ring-2 hover:ring-stone-900 focus-visible:ring-2 focus-visible:ring-stone-900"
+                  className="group block w-full overflow-hidden rounded-lg ring-1 ring-[#2A1B2E]/10 hover:ring-2 hover:ring-[#D9577F] focus-visible:ring-2 focus-visible:ring-[#D9577F]"
                   title={m.name}
                 >
                   {/* eslint-disable-next-line @next/next/no-img-element */}

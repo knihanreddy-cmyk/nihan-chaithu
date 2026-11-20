@@ -59,21 +59,21 @@ export default function ContentEditor({
 
   return (
     <div>
-      <div className="sticky top-[104px] z-10 -mx-4 mb-6 flex flex-wrap items-center gap-3 border-b border-stone-200 bg-stone-100/95 px-4 py-3 backdrop-blur md:top-0 md:-mx-8 md:px-8">
+      <div className="sticky top-[100px] z-10 mb-6 flex flex-wrap items-center gap-3 rounded-[22px] border border-white/70 bg-white/70 px-5 py-3 shadow-[0_20px_50px_-35px_rgba(42,27,46,.6)] backdrop-blur-xl md:top-4">
         <div className="mr-auto min-w-0">
-          <h1 className="text-xl font-semibold">{schema.title}</h1>
-          <p className={`text-xs ${status?.kind === "error" ? "text-red-700" : "text-stone-500"}`} role="status">
+          <h1 className="font-playfair text-3xl leading-tight">{schema.title}</h1>
+          <p className={`text-xs ${status?.kind === "error" ? "text-red-700" : "text-[#2A1B2E]/55"}`} role="status">
             {dirty ? "Unsaved changes" : (status?.text ?? "Showing the built-in content. Save to store it in the database.")}
           </p>
         </div>
-        <a href={schema.path} target="_blank" className="rounded-lg px-3 py-2 text-sm font-medium text-stone-600 hover:bg-white">
+        <a href={schema.path} target="_blank" className="rounded-full px-3.5 py-2 text-sm font-medium text-[#2A1B2E]/65 hover:bg-white">
           View page ↗
         </a>
         {dirty && (
           <button
             type="button"
             onClick={() => setValue(saved)}
-            className="rounded-lg px-3 py-2 text-sm font-medium text-stone-600 hover:bg-white"
+            className="rounded-full px-3.5 py-2 text-sm font-medium text-[#2A1B2E]/65 hover:bg-white"
           >
             Discard
           </button>
@@ -82,7 +82,7 @@ export default function ContentEditor({
           type="button"
           onClick={save}
           disabled={!canSave || pending || !dirty}
-          className="rounded-lg bg-stone-900 px-5 py-2 text-sm font-semibold text-white hover:bg-stone-700 disabled:opacity-40"
+          className="rounded-full bg-[#2A1B2E] px-5 py-2 text-sm font-semibold text-white hover:bg-[#3B2741] disabled:opacity-40"
           title={canSave ? "Save (Ctrl+S)" : "Set MONGODB_URI to enable saving"}
         >
           {pending ? "Saving…" : "Save & publish"}
@@ -91,14 +91,14 @@ export default function ContentEditor({
 
       <div className="space-y-4">
         {schema.sections.map((section, i) => (
-          <details key={section.key} open={i === 0} className="group rounded-xl bg-white ring-1 ring-stone-200">
+          <details key={section.key} open={i === 0} className="group rounded-[22px] border border-white/70 bg-white/65 shadow-[0_24px_60px_-40px_rgba(42,27,46,.5)] backdrop-blur-xl">
             <summary className="flex cursor-pointer list-none items-center justify-between px-5 py-4 font-semibold">
               {section.label}
-              <span className="text-sm font-normal text-stone-400 group-open:rotate-180" aria-hidden="true">
+              <span className="text-sm font-normal text-[#2A1B2E]/40 group-open:rotate-180" aria-hidden="true">
                 ▾
               </span>
             </summary>
-            <div className="space-y-5 border-t border-stone-100 px-5 py-5">
+            <div className="space-y-5 border-t border-[#2A1B2E]/5 px-5 py-5">
               <Fields
                 fields={section.fields}
                 value={(value[section.key] as Obj) ?? {}}
@@ -112,7 +112,7 @@ export default function ContentEditor({
       {canSave && (
         <form
           action={resetContent.bind(null, schema.id)}
-          className="mt-10 border-t border-stone-200 pt-6"
+          className="mt-10 border-t border-[#2A1B2E]/10 pt-6"
           onSubmit={(e) => {
             if (!confirm("Reset this page to the original built-in words and photos? Your saved edits will be deleted.")) e.preventDefault();
           }}

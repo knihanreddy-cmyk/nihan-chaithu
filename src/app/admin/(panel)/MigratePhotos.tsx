@@ -37,7 +37,7 @@ export default function MigratePhotos({ total }: { total: number }) {
         type="button"
         onClick={run}
         disabled={running}
-        className="rounded-lg bg-stone-900 px-4 py-2 text-sm font-semibold text-white hover:bg-stone-700 disabled:opacity-60"
+        className="rounded-full bg-[#2A1B2E] px-5 py-2.5 text-sm font-semibold text-white shadow-[0_14px_30px_-14px_rgba(42,27,46,.8)] hover:bg-[#3B2741] disabled:opacity-60"
       >
         {running ? `Moving… ${total - left} of ${total}` : "Move photos to ImageKit"}
       </button>

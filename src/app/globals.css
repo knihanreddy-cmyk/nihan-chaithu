@@ -17,6 +17,13 @@
 
 * {
   box-sizing: border-box;
+}
+
+/*
+ * The site's own reset. Unlayered rules beat Tailwind's spacing utilities, so the
+ * admin (.admin) is left out and relies on Tailwind's preflight instead.
+ */
+:where(*:not(.admin, .admin *)) {
   margin: 0;
   padding: 0;
 }

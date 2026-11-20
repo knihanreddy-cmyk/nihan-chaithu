@@ -43,25 +43,25 @@ export default function MediaLibrary({ initial }: { initial: MediaItem[] }) {
           placeholder="Search by file name"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          className="min-w-0 flex-1 rounded-lg border border-stone-300 bg-white px-3 py-2 text-sm sm:max-w-xs"
+          className="min-w-0 flex-1 rounded-lg border border-[#2A1B2E]/15 bg-white px-3 py-2 text-sm sm:max-w-xs"
         />
-        <span className="text-sm text-stone-500">{items.length} photos</span>
+        <span className="text-sm text-[#2A1B2E]/55">{items.length} photos</span>
       </div>
       {message && (
-        <p className="mt-3 rounded-lg bg-white p-3 text-sm ring-1 ring-stone-200" role="status">
+        <p className="mt-3 rounded-lg bg-white p-3 text-sm ring-1 ring-[#2A1B2E]/10" role="status">
           {message}
         </p>
       )}
 
       {shown.length === 0 ? (
-        <p className="mt-10 text-center text-sm text-stone-500">
+        <p className="mt-6 rounded-[22px] border border-dashed border-[#2A1B2E]/15 bg-white/40 p-12 text-center text-sm text-[#2A1B2E]/55 backdrop-blur">
           {items.length ? "No photos match." : "No photos yet. Upload some to get started."}
         </p>
       ) : (
         <ul className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
           {shown.map((m) => (
-            <li key={m.id} className="overflow-hidden rounded-xl bg-white ring-1 ring-stone-200">
-              <div className="aspect-[4/5] bg-stone-200">
+            <li key={m.id} className="overflow-hidden rounded-[22px] border border-white/70 bg-white/65 shadow-[0_24px_60px_-40px_rgba(42,27,46,.5)] backdrop-blur-xl">
+              <div className="aspect-[4/5] bg-[#E9DDF0]">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={thumb(m.url, 480)} alt="" loading="lazy" className="h-full w-full object-cover" />
               </div>
@@ -69,14 +69,14 @@ export default function MediaLibrary({ initial }: { initial: MediaItem[] }) {
                 <p className="truncate text-sm font-medium" title={m.name}>
                   {m.name}
                 </p>
-                <p className="text-xs text-stone-500">
+                <p className="text-xs text-[#2A1B2E]/55">
                   {m.width}×{m.height} · {kb(m.size)}
                 </p>
                 <div className="mt-2 flex gap-3 text-xs">
-                  <button type="button" className="text-stone-600 hover:text-stone-900" onClick={() => copy(m.url)}>
+                  <button type="button" className="text-[#2A1B2E]/65 hover:text-[#2A1B2E]" onClick={() => copy(m.url)}>
                     Copy link
                   </button>
-                  <a className="text-stone-600 hover:text-stone-900" href={m.url} target="_blank" rel="noreferrer">
+                  <a className="text-[#2A1B2E]/65 hover:text-[#2A1B2E]" href={m.url} target="_blank" rel="noreferrer">
                     Open
                   </a>
                   <button
